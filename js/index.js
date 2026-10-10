@@ -2,16 +2,16 @@ import { Showcase } from "./Showcase";
 import { Slides } from "./Slides";
 import { Cursor } from "./Cursor";
 import { Progress } from "./Progress";
-import image2 from "../images/2.jpg";
 import image3 from "../images/3.jpg";
 import image4 from "../images/4.jpg";
 import image5 from "../images/5.jpg";
-import depth2 from "../images/2-depth.png";
 import depth3 from "../images/3-depth.png";
 import depth4 from "../images/4-depth.png";
 import depth5 from "../images/5-depth.png";
 import tujia from "../images/岩墙花.jpg";
 import tujiaDepth from "../images/岩墙花-depth.png";
+import jiumeihua from "../images/九朵梅.jpg";
+import jiumeihuaDepth from "../images/九朵梅-depth.png";
 
 const container = document.getElementById("app");
 const cursor = new Cursor(document.querySelector(".cursor"));
@@ -29,10 +29,15 @@ const slidesData = [
     meta: "最难岩墙椅子花"
   },
   {
-    image: image2,
-    depth: depth2,
-    title: "Barcelona",
-    meta: "Spain / Catalonia"
+    image: jiumeihua,
+    depth: jiumeihuaDepth,
+    // 与第一张同一套处理：桌面保留完整人物、照片收成右侧竖画面，
+    // y 略抬到 0.58 是因为这张的头饰更高，避免切到银冠顶部。
+    focus: { x: 0.3, y: 0.58, zoom: 1.6 },
+    // 竖屏手机：整幅照片高度 + 两侧轻微裁切，人物与织锦都在画面内。
+    focusMobile: { x: 0.45, y: 0.55, zoom: 1.5 },
+    title: "九朵梅",
+    meta: "九梅含韧久安康"
   },
   {
     image: image3,
