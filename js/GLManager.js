@@ -7,8 +7,8 @@ import {
 // Fake 3D tuning.
 // Both knobs were 0.02 / 2deg; dialled back so the 3D reads as a hint of depth
 // instead of the photo swinging around.
-const PARALLAX_STRENGTH = 0.012; // max shift, as a fraction of the viewport height
-const MAX_TILT = (1.2 * Math.PI) / 180; // radians, camera like plane tilt
+const PARALLAX_STRENGTH = 0.008; // max shift, as a fraction of the viewport height
+const MAX_TILT = (0.8 * Math.PI) / 180; // radians, camera like plane tilt
 const BACKGROUND_COLOR = 0x131319; // matches #app in css/styles.css
 // Cover keeps a small border so the parallax never samples outside the photo.
 const COVER_MARGIN = 0.97;
@@ -54,10 +54,18 @@ function GLManager(data) {
   this.render = this.render.bind(this);
   this.loader = new THREE.TextureLoader();
   this.textures = data.map((entry, i) =>
-    this.loader.load(
-      entry.image,
-      this.onImageLoaded.bind(this, i)
-    )
+    this.loader.load(entry.image, texture => {
+      // Photos are not power-of-two. three.js only forces them onto a POT
+      // canvas (which floors the size to 1024 and squashes the aspect) when
+      // mipmapping is on, so keep mipmaps off: NPOT is fine with
+      // ClampToEdge + Linear filtering and the photo stays at full detail.
+      texture.minFilter = THREE.LinearFilter;
+      texture.magFilter = THREE.LinearFilter;
+      texture.generateMipmaps = false;
+      texture.wrapS = THREE.ClampToEdgeWrapping;
+      texture.wrapT = THREE.ClampToEdgeWrapping;
+      this.onImageLoaded(i, texture);
+    })
   );
   this.depths = data.map((entry, i) => {
     const flat = createFlatDepthTexture();
