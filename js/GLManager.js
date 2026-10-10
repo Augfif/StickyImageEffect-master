@@ -5,8 +5,10 @@ import {
 } from "./shaders";
 
 // Fake 3D tuning.
-const PARALLAX_STRENGTH = 0.02; // max shift, as a fraction of the viewport height
-const MAX_TILT = (2 * Math.PI) / 180; // radians, camera like plane tilt
+// Both knobs were 0.02 / 2deg; dialled back so the 3D reads as a hint of depth
+// instead of the photo swinging around.
+const PARALLAX_STRENGTH = 0.012; // max shift, as a fraction of the viewport height
+const MAX_TILT = (1.2 * Math.PI) / 180; // radians, camera like plane tilt
 const BACKGROUND_COLOR = 0x131319; // matches #app in css/styles.css
 // Cover keeps a small border so the parallax never samples outside the photo.
 const COVER_MARGIN = 0.97;
