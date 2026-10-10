@@ -1,0 +1,15 @@
+*.DS_Store
+node_modules
+.cache
+dist
+
+# 第三方资料：仅本地参考，版权不属于本项目，不随公开仓库分发
+# fake3d-master/   Codrops 的 fake3d 示例（其授权禁止原样再分发）
+# ultranoir-dump/  ultranoir.com 线上产物抓取（含商业字体与站点资源）
+# ultranoir-site/  Wayback 存档的 ultranoir 旧站页面
+fake3d-master/
+ultranoir-dump/
+ultranoir-site/
+
+# 本地临时文件
+_*

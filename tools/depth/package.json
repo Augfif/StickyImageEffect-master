@@ -1,0 +1,14 @@
+{
+  "name": "sticky-depth-tools",
+  "private": true,
+  "type": "module",
+  "version": "1.0.0",
+  "description": "Offline depth map generator for the sticky image effect",
+  "scripts": {
+    "start": "node make-depth.mjs"
+  },
+  "dependencies": {
+    "@huggingface/transformers": "^4.3.1",
+    "sharp": "^0.35.5"
+  }
+}

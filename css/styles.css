@@ -1,0 +1,223 @@
+/* Brush/calligraphy face for Chinese titles, self hosted so it renders the
+   same everywhere. Local Windows calligraphy fonts stay as fallbacks. */
+@font-face {
+  font-family: "Ma Shan Zheng";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("../fonts/MaShanZheng-Regular.woff2") format("woff2");
+}
+
+#app {
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  position: fixed;
+  top: 0;
+  left: 0;
+  background-color: #131319;
+}
+
+canvas {
+  -webkit-touch-callout: none;
+  /* iOS Safari */
+  -webkit-user-select: none;
+  /* Safari */
+  -khtml-user-select: none;
+  /* Konqueror HTML */
+  -moz-user-select: none;
+  /* Firefox */
+  -ms-user-select: none;
+  /* Internet Explorer/Edge */
+  user-select: none;
+  /* Non-prefixed version, currently */
+}
+
+.slides {
+  box-sizing: border-box;
+  position: absolute;
+  top: 50%;
+  padding: 0 10vw;
+  width: 100%;
+  max-width: 100%;
+  -webkit-touch-callout: none;
+  /* iOS Safari */
+  -webkit-user-select: none;
+  /* Safari */
+  -khtml-user-select: none;
+  /* Konqueror HTML */
+  -moz-user-select: none;
+  /* Firefox */
+  -ms-user-select: none;
+  /* Internet Explorer/Edge */
+  user-select: none;
+  /* Non-prefixed version, currently */
+}
+
+.slide {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  height: 33vh;
+  color: #fff;
+  transform: translateY(-50%);
+  transition: transform 1300ms cubic-bezier(0.2, 1, 0.3, 1), opacity 500ms cubic-bezier(0.2, 1, 0.3, 1);
+}
+
+.slide-meta {
+  margin: 0;
+  font-size: 1.35rem;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.slide-meta,
+.slide-more {
+  opacity: 0;
+  transition: opacity 900ms cubic-bezier(0.2, 1, 0.3, 1);
+}
+
+.show-meta .slide-meta,
+.show-meta .slide-more {
+  opacity: 1;
+  transition: opacity 1500ms 300ms cubic-bezier(0.2, 1, 0.3, 1);
+}
+
+.slide-more {
+  border-bottom: 1px solid;
+}
+
+.slide-more:hover {
+  border-bottom: 1px solid transparent;
+}
+
+.slide-title {
+  font-size: 10vw;
+  margin: 0;
+  color: #fafafa;
+  text-indent: -0.5vw;
+  font-family: gibbs, sans-serif;
+  font-weight: 900;
+  transition: color 500ms cubic-bezier(0.2, 1, 0.3, 1);
+}
+
+.slide--cjk .slide-title,
+.slide--cjk .slide-meta {
+  font-family: "Ma Shan Zheng", "华文行楷", "STXingkai", "方正舒体", "FZShuTi",
+    "楷体", "KaiTi", "STKaiti", serif;
+  font-weight: 400;
+}
+
+.slide--cjk .slide-title {
+  /* The brush face has different side bearings than the Latin one. */
+  text-indent: 0;
+  letter-spacing: 0.02em;
+  /* Chinese copy is denser than the Latin titles, keep it a bit smaller so
+     it clears the focused subject instead of covering it. */
+  font-size: 7vw;
+}
+
+.prev,
+.next {
+  opacity: 0;
+}
+
+.prev {
+  transform: translateY(-85%);
+}
+
+.next {
+  transform: translateY(-15%);
+}
+
+.prev .slide-title,
+.next .slide-title {
+  -webkit-text-stroke: 1.5px #fafafa;
+  text-stroke: 1.5px #fafafa;
+  -webkit-text-fill-color: transparent;
+  text-fill-color: transparent;
+  color: transparent;
+}
+
+.scrolling>.slide {
+  transform: translateY(-50%);
+  opacity: 1;
+}
+
+/* Progress sidebar: up arrow / track + knob / "x / N" / down arrow.
+   The container is fixed to the viewport, the label lives inside it so it
+   never drifts while the canvas scales in and out of the fullscreen state. */
+.progress {
+  --progress: 0;
+  position: fixed;
+  top: 50%;
+  right: 2.5rem;
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transform: translateY(-50%);
+  pointer-events: none;
+  color: #fff;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+.progress__arrow {
+  width: 0;
+  height: 0;
+  border-left: 7px solid transparent;
+  border-right: 7px solid transparent;
+}
+
+.progress__arrow--up {
+  border-bottom: 9px solid #fff;
+  margin-bottom: 0.9rem;
+}
+
+.progress__arrow--down {
+  border-top: 9px solid #fff;
+  margin-top: 0.9rem;
+}
+
+.progress__track {
+  position: relative;
+  width: 2px;
+  height: 40vh;
+  min-height: 220px;
+  max-height: 420px;
+  background: rgba(255, 255, 255, 0.45);
+}
+
+.progress__knob {
+  position: absolute;
+  left: 50%;
+  bottom: calc(var(--progress) * (100% - 28px));
+  width: 4px;
+  height: 28px;
+  margin-left: -2px;
+  background: #fff;
+  transition: bottom 400ms cubic-bezier(0.2, 1, 0.3, 1);
+}
+
+.progress--instant .progress__knob {
+  transition: none;
+}
+
+.progress__label {
+  position: relative;
+  margin-top: 1rem;
+  font-size: 1.5rem;
+  font-style: italic;
+  font-weight: 700;
+  line-height: 1;
+  white-space: nowrap;
+  color: #fff;
+}
