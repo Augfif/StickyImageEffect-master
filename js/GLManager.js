@@ -10,6 +10,9 @@ const MAX_TILT = (2 * Math.PI) / 180; // radians, camera like plane tilt
 const BACKGROUND_COLOR = 0x131319; // matches #app in css/styles.css
 // Cover keeps a small border so the parallax never samples outside the photo.
 const COVER_MARGIN = 0.97;
+// Must stay in sync with "@media (min-width: 53em)" in css/styles.css: above it
+// the desktop composition applies, below it slides may use their phone crop.
+const DESKTOP_QUERY = "(min-width: 53em)";
 
 // Flat depth: used before a depth map is decoded and whenever one is missing,
 // so a slide without a depth map simply has no parallax instead of breaking.
@@ -132,7 +135,9 @@ GLManager.prototype.calculateFit = function (index, texture) {
   if (!image) return;
 
   const entry = this.data[index] || {};
-  const focus = entry.focus || {};
+  const isDesktop = window.matchMedia(DESKTOP_QUERY).matches;
+  const focus =
+    (isDesktop ? entry.focus : entry.focusMobile || entry.focus) || {};
   const zoom = focus.zoom > 0 ? focus.zoom : 1;
   const viewportAspect = window.innerWidth / window.innerHeight;
   const imageAspect = image.width / image.height;

@@ -294,37 +294,6 @@ a:focus {
   outline: none;
 }
 
-.frame {
-  padding: 3rem 5vw;
-  text-align: center;
-  position: relative;
-  z-index: 1000;
-}
-
-.frame__title {
-  font-size: 1rem;
-  margin: 0 0 1rem;
-  font-weight: normal;
-}
-
-.frame__links {
-  display: inline;
-}
-
-.frame__links a:not(:last-child),
-.frame__demos a:not(:last-child) {
-  margin-right: 1rem;
-}
-
-.frame__demos {
-  margin: 1rem 0;
-}
-
-.frame__demo--current,
-.frame__demo--current:hover {
-  color: var(--color-text);
-}
-
 .content {
   display: flex;
   flex-direction: column;
@@ -336,69 +305,6 @@ a:focus {
 }
 
 @media screen and (min-width: 53em) {
-  .frame {
-    position: fixed;
-    text-align: left;
-    z-index: 10000;
-    top: 0;
-    left: 0;
-    display: grid;
-    align-content: space-between;
-    width: 100%;
-    max-width: none;
-    height: 100vh;
-    padding: 2rem;
-    pointer-events: none;
-    grid-template-columns: 75% 25%;
-    grid-template-rows: auto auto auto;
-    grid-template-areas:
-      "title links"
-      "... ..."
-      "tip ...";
-  }
-
-  .frame__title-wrap {
-    grid-area: title;
-    display: flex;
-  }
-
-  .frame__title {
-    margin: 0;
-  }
-
-  .frame__tagline {
-    position: relative;
-    margin: 0;
-    padding: 0 0 0 1rem;
-  }
-
-  .frame__tagline::before {
-    content: '-------------';
-    letter-spacing: -0.15rem;
-    margin: 0 1rem 0 0;
-  }
-
-  .frame__tip {
-    grid-area: tip;
-    margin: 0;
-  }
-
-  .frame__demos {
-    margin: 0;
-    grid-area: demos;
-    justify-self: end;
-  }
-
-  .frame__links {
-    grid-area: links;
-    padding: 0;
-    justify-self: end;
-  }
-
-  .frame a {
-    pointer-events: auto;
-  }
-
   .content {
     height: 100vh;
     justify-content: center;

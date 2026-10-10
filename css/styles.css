@@ -8,9 +8,17 @@
   src: url("../fonts/MaShanZheng-Regular.woff2") format("woff2");
 }
 
+html,
+body {
+  /* Keep the browser from bouncing / pull-to-refresh while dragging. */
+  overscroll-behavior: none;
+}
+
 #app {
   width: 100vw;
   height: 100vh;
+  /* dvh follows the mobile address bar, 100vh stays as fallback */
+  height: 100dvh;
   overflow: hidden;
   position: fixed;
   top: 0;
@@ -18,7 +26,29 @@
   background-color: #131319;
 }
 
+/* Bottom scrim: on phones the copy sits on top of the photo, this keeps it
+   readable. Hidden on desktop, where the copy sits on the dark left column. */
+#app::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 46vh;
+  z-index: 1;
+  pointer-events: none;
+  background: linear-gradient(
+    to top,
+    rgba(8, 8, 11, 0.95) 0%,
+    rgba(8, 8, 11, 0.9) 40%,
+    rgba(8, 8, 11, 0.6) 72%,
+    rgba(8, 8, 11, 0) 100%
+  );
+}
+
 canvas {
+  /* The whole gesture is press & drag, never scroll. */
+  touch-action: none;
   -webkit-touch-callout: none;
   /* iOS Safari */
   -webkit-user-select: none;
@@ -36,8 +66,10 @@ canvas {
 .slides {
   box-sizing: border-box;
   position: absolute;
-  top: 50%;
-  padding: 0 10vw;
+  /* Phone default: copy sinks into the strongest part of the bottom scrim. */
+  top: calc(50% + 26vh);
+  padding: 0 6vw;
+  z-index: 2;
   width: 100%;
   max-width: 100%;
   -webkit-touch-callout: none;
@@ -62,7 +94,7 @@ canvas {
   width: 100%;
   max-width: 1200px;
   margin: 0 auto;
-  height: 33vh;
+  height: 26vh;
   color: #fff;
   transform: translateY(-50%);
   transition: transform 1300ms cubic-bezier(0.2, 1, 0.3, 1), opacity 500ms cubic-bezier(0.2, 1, 0.3, 1);
@@ -70,7 +102,9 @@ canvas {
 
 .slide-meta {
   margin: 0;
-  font-size: 1.35rem;
+  font-size: clamp(0.85rem, 3.6vw, 1.15rem);
+  /* Phones put the copy on top of the photo, keep it legible over detail. */
+  text-shadow: 0 1px 12px rgba(0, 0, 0, 0.75);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -89,6 +123,7 @@ canvas {
 
 .slide-more {
   border-bottom: 1px solid;
+  text-shadow: 0 1px 12px rgba(0, 0, 0, 0.75);
 }
 
 .slide-more:hover {
@@ -96,7 +131,8 @@ canvas {
 }
 
 .slide-title {
-  font-size: 10vw;
+  font-size: clamp(2.2rem, 12vw, 5rem);
+  text-shadow: 0 2px 20px rgba(0, 0, 0, 0.75);
   margin: 0;
   color: #fafafa;
   text-indent: -0.5vw;
@@ -118,7 +154,7 @@ canvas {
   letter-spacing: 0.02em;
   /* Chinese copy is denser than the Latin titles, keep it a bit smaller so
      it clears the focused subject instead of covering it. */
-  font-size: 7vw;
+  font-size: clamp(2.4rem, 13vw, 5.5rem);
 }
 
 .prev,
@@ -155,8 +191,9 @@ canvas {
   --progress: 0;
   position: fixed;
   top: 50%;
-  right: 2.5rem;
-  z-index: 1000;
+  /* Phone default: slim and tucked against the edge. */
+  right: 12px;
+  z-index: 3;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -173,36 +210,36 @@ canvas {
 .progress__arrow {
   width: 0;
   height: 0;
-  border-left: 7px solid transparent;
-  border-right: 7px solid transparent;
+  border-left: 5px solid transparent;
+  border-right: 5px solid transparent;
 }
 
 .progress__arrow--up {
-  border-bottom: 9px solid #fff;
-  margin-bottom: 0.9rem;
+  border-bottom: 7px solid #fff;
+  margin-bottom: 0.6rem;
 }
 
 .progress__arrow--down {
-  border-top: 9px solid #fff;
-  margin-top: 0.9rem;
+  border-top: 7px solid #fff;
+  margin-top: 0.6rem;
 }
 
 .progress__track {
   position: relative;
-  width: 2px;
-  height: 40vh;
-  min-height: 220px;
-  max-height: 420px;
+  width: 1.5px;
+  height: 22vh;
+  min-height: 120px;
+  max-height: 260px;
   background: rgba(255, 255, 255, 0.45);
 }
 
 .progress__knob {
   position: absolute;
   left: 50%;
-  bottom: calc(var(--progress) * (100% - 28px));
-  width: 4px;
-  height: 28px;
-  margin-left: -2px;
+  bottom: calc(var(--progress) * (100% - 18px));
+  width: 3px;
+  height: 18px;
+  margin-left: -1.5px;
   background: #fff;
   transition: bottom 400ms cubic-bezier(0.2, 1, 0.3, 1);
 }
@@ -213,11 +250,85 @@ canvas {
 
 .progress__label {
   position: relative;
-  margin-top: 1rem;
-  font-size: 1.5rem;
+  margin-top: 0.6rem;
+  font-size: 1.05rem;
   font-style: italic;
   font-weight: 700;
   line-height: 1;
   white-space: nowrap;
   color: #fff;
+}
+
+/* Desktop / large tablet: the original composition. The focus crop leaves a
+   dark column on the left, so the copy can sit beside the photo instead of on
+   top of it, and the bottom scrim is not needed. */
+@media (min-width: 53em) {
+  #app::after {
+    display: none;
+  }
+
+  .slides {
+    top: 50%;
+    padding: 0 10vw;
+  }
+
+  .slide {
+    height: 33vh;
+  }
+
+  .slide-meta {
+    font-size: 1.35rem;
+    text-shadow: none;
+  }
+
+  .slide-title {
+    font-size: 10vw;
+    text-shadow: none;
+  }
+
+  .slide-more {
+    text-shadow: none;
+  }
+
+  .slide--cjk .slide-title {
+    font-size: 7vw;
+  }
+
+  .progress {
+    right: 2.5rem;
+  }
+
+  .progress__arrow {
+    border-left-width: 7px;
+    border-right-width: 7px;
+  }
+
+  .progress__arrow--up {
+    border-bottom-width: 9px;
+    margin-bottom: 0.9rem;
+  }
+
+  .progress__arrow--down {
+    border-top-width: 9px;
+    margin-top: 0.9rem;
+  }
+
+  .progress__track {
+    width: 2px;
+    height: 40vh;
+    min-height: 220px;
+    max-height: 420px;
+  }
+
+  .progress__knob {
+    bottom: calc(var(--progress) * (100% - 28px));
+    width: 4px;
+    height: 28px;
+    margin-left: -2px;
+  }
+
+  .progress__label {
+    margin-top: 1rem;
+    font-size: 1.5rem;
+  }
 }
