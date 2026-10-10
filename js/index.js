@@ -2,16 +2,16 @@ import { Showcase } from "./Showcase";
 import { Slides } from "./Slides";
 import { Cursor } from "./Cursor";
 import { Progress } from "./Progress";
-import image3 from "../images/3.jpg";
-import image4 from "../images/4.jpg";
-import image5 from "../images/5.jpg";
-import depth3 from "../images/3-depth.png";
-import depth4 from "../images/4-depth.png";
-import depth5 from "../images/5-depth.png";
 import tujia from "../images/岩墙花.jpg";
 import tujiaDepth from "../images/岩墙花-depth.png";
 import jiumeihua from "../images/九朵梅.jpg";
 import jiumeihuaDepth from "../images/九朵梅-depth.png";
+import yizihua from "../images/椅子花.jpg";
+import yizihuaDepth from "../images/椅子花-depth.png";
+import liyu from "../images/鲤鱼跃龙门.jpg";
+import liyuDepth from "../images/鲤鱼跃龙门-depth.png";
+import yangqueniao from "../images/阳雀鸟.jpg";
+import yangqueniaoDepth from "../images/阳雀鸟-depth.png";
 
 const container = document.getElementById("app");
 const cursor = new Cursor(document.querySelector(".cursor"));
@@ -40,22 +40,32 @@ const slidesData = [
     meta: "九梅含韧久安康"
   },
   {
-    image: image3,
-    depth: depth3,
-    title: "Málaga",
-    meta: "Spain / Andalusia"
+    image: yizihua,
+    depth: yizihuaDepth,
+    // 竖图同一套处理；y 抬到 0.60 是因为人物与横织锦整体偏上。
+    focus: { x: 0.3, y: 0.6, zoom: 1.6 },
+    focusMobile: { x: 0.48, y: 0.55, zoom: 1.45 },
+    title: "椅子花",
+    meta: "椅织锦纹藏巧艺"
   },
   {
-    image: image4,
-    depth: depth4,
-    title: "Pamplona",
-    meta: "Spain / Navarre"
+    image: liyu,
+    depth: liyuDepth,
+    // 横图：桌面用 <1 的 zoom 把整张照片缩成右侧卡片（左 30% 留暗底给标题，
+    // 与竖图那几张的观感一致）；手机上 cover 本身已裁到 28.6% 宽，zoom 1 即可。
+    focus: { x: 0.286, y: 0.5, zoom: 0.68 },
+    focusMobile: { x: 0.52, y: 0.5, zoom: 1 },
+    title: "鲤鱼跃龙门",
+    meta: "鲤跃锦图盼前程"
   },
   {
-    image: image5,
-    depth: depth5,
-    title: "Bilbao",
-    meta: "Spain / Biscay"
+    image: yangqueniao,
+    depth: yangqueniaoDepth,
+    // 竖图，人物与斜挂的长织锦偏右下，聚焦点相应右移。
+    focus: { x: 0.3, y: 0.5, zoom: 1.6 },
+    focusMobile: { x: 0.53, y: 0.55, zoom: 1.5 },
+    title: "阳雀鸟",
+    meta: "阳雀成双载希望"
   }
 ];
 
