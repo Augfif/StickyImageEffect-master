@@ -1,5 +1,6 @@
 import { Showcase } from "./Showcase";
 import { Slides } from "./Slides";
+import { Sheet } from "./Sheet";
 import { Cursor } from "./Cursor";
 import { Progress } from "./Progress";
 import tujia from "../images/岩墙花.jpg";
@@ -14,6 +15,13 @@ import yangqueniao from "../images/阳雀鸟.jpg";
 import yangqueniaoDepth from "../images/阳雀鸟-depth.png";
 
 const container = document.getElementById("app");
+// #app clips the canvas with overflow: hidden, which still makes it a scroll
+// container: focusing an element inside it can make the browser scroll it and
+// shift the whole composition. Nothing here scrolls, so keep it pinned.
+container.addEventListener("scroll", () => {
+  container.scrollTop = 0;
+  container.scrollLeft = 0;
+});
 const cursor = new Cursor(document.querySelector(".cursor"));
 const slidesData = [
   {
@@ -69,7 +77,11 @@ const slidesData = [
   }
 ];
 
-const slides = new Slides(slidesData);
+// `sheet` is referenced lazily from the slide callback, so declaring it below
+// is fine: nothing runs before both are created and mounted.
+const slides = new Slides(slidesData, {
+  onReadMore: index => sheet.open(index)
+});
 const progress = new Progress(slidesData.length);
 const showcase = new Showcase(slidesData, {
   onActiveIndexChange: activeIndex => {
@@ -96,9 +108,33 @@ const showcase = new Showcase(slidesData, {
   onFullscreenFinish: ({ activeIndex }) => {}
 });
 
+const sheet = new Sheet({
+  data: slidesData,
+  // Hands the copy its resting rect before the panel starts moving, then
+  // takes the gesture over: no zoom out, no drag to switch slides.
+  onOpen: index => {
+    slides.beginReading(index);
+    showcase.setLocked(true);
+  },
+  // Lets the copy re-measure its resting rect before the new geometry lands.
+  onResize: () => slides.measureReading(),
+  // One clock for the whole move: the photo recedes, the glass frosts (css)
+  // and the copy follows late -- all off the same openness.
+  onApply: ({ sheetTop, openness }) => {
+    slides.setReading(sheetTop);
+    showcase.setRecede(openness);
+  },
+  onClose: index => {
+    showcase.setLocked(false);
+    slides.endReading();
+    slides.focusReadMore(index);
+  }
+});
+
 showcase.mount(container);
 slides.mount(container);
 progress.mount(document.body);
+sheet.mount(document.body);
 showcase.render();
 
 window.addEventListener("resize", function() {

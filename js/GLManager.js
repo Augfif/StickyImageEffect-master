@@ -407,6 +407,22 @@ GLManager.prototype.onResize = function () {
 
   this.render();
 };
+
+// The camera pushing in while the glass rises. Scaling the canvas with css
+// rather than the shader keeps this out of the render loop entirely: the
+// compositor does it, and the long press zoom in the shader (u_progress) is a
+// different gesture that can never run at the same time.
+GLManager.prototype.setRecede = function (progress) {
+  const element = this.renderer && this.renderer.domElement;
+  if (!element) return;
+  const p = Math.max(0, Math.min(1, progress));
+  if (p <= 0.001) {
+    element.style.transform = "";
+    return;
+  }
+  element.style.transform = `translateY(${-1 * p}%) scale(${1 + 0.045 * p})`;
+};
+
 GLManager.prototype.scheduleLoop = function () {
   if (this.loopRaf) return;
   this.loop();

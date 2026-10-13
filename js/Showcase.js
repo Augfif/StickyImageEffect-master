@@ -28,6 +28,13 @@ function Showcase(data, options = {}) {
   this.direction = 1;
   this.waveIntensity = 0;
 
+  // Set while the copy sheet is open: the slideshow keeps whatever pose it
+  // was in, but no new zoom out / drag gesture can start.
+  this.locked = false;
+  // True between onGrabStart and onGrabEnd, so a gesture that was already in
+  // flight when the sheet opened is still allowed to finish.
+  this.grabbing = false;
+
   this.options = options;
 
   this.index = {
@@ -72,6 +79,8 @@ function clamp(num, min, max) {
 }
 
 Showcase.prototype.onMouseMove = function (ev) {
+  if (this.locked) return;
+
   if (this.followerSpring) {
     this.followerSpring.stop();
     this.followerSpring = null;
@@ -122,6 +131,8 @@ Showcase.prototype.onMouseMove = function (ev) {
 };
 
 Showcase.prototype.onGrabMove = function (scroll) {
+  if (this.locked && !this.grabbing) return;
+
   this.index.target = clamp(
     this.index.initial + scroll.delta / this.index.scrollSize,
     -this.data.length + 0.51,
@@ -180,6 +191,9 @@ Showcase.prototype.onGrabMove = function (scroll) {
   });
 };
 Showcase.prototype.onGrabStart = function () {
+  if (this.locked) return;
+  this.grabbing = true;
+
   if (this.options.onZoomOutStart) {
     this.options.onZoomOutStart({
       activeIndex: this.index.active
@@ -266,6 +280,9 @@ Showcase.prototype.snapCurrentToActiveIndex = function () {
 };
 
 Showcase.prototype.onGrabEnd = function () {
+  if (this.locked && !this.grabbing) return;
+  this.grabbing = false;
+
   if (this.options.onFullscreenStart) {
     this.options.onFullscreenStart({
       activeIndex: this.index.active
@@ -329,6 +346,23 @@ Showcase.prototype.onGrabEnd = function () {
 
 Showcase.prototype.onResize = function () {
   this.GL.onResize();
+};
+
+Showcase.prototype.setLocked = function (locked) {
+  this.locked = !!locked;
+  // Belt and braces: the sheet carves itself out of Grab's listeners already,
+  // this also stops a press on the photo behind it from creating drag state.
+  this.grab.setEnabled(!this.locked);
+  if (this.locked && this.followerSpring) {
+    this.followerSpring.stop();
+    this.followerSpring = null;
+  }
+};
+
+// First beat of the reading transition: the photo itself backs off a touch, so
+// the glass pane reads as a change of scene instead of a slab arriving.
+Showcase.prototype.setRecede = function (progress) {
+  this.GL.setRecede(progress);
 };
 export {
   Showcase

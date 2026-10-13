@@ -1,0 +1,403 @@
+/* The opener. base.css is loaded first, so this file only owns the pieces that
+   are unique to the root page: the fixed webgl layer, the beat copy, the
+   bottom rail, the start prompt and the loader. */
+
+.intro {
+  background: #131319;
+  color: #fff;
+  overflow-x: hidden;
+}
+
+/* ScrollSmoother drives the real document scroll, so the scrollbar is real --
+   but the opener is a full screen film, it should not be framed by one. This
+   file is only ever loaded by the opener. */
+html {
+  scrollbar-width: none;
+}
+
+html::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+}
+
+/* Held while the opening move plays so the scroll cannot be grabbed early. */
+.intro-locked,
+.intro-locked body {
+  overflow: hidden;
+}
+
+/* ScrollSmoother pins #smooth-wrapper itself; when it is switched off (reduced
+   motion) the wrapper stays in normal flow and the tall .intro-scroll below
+   gives the document its native scroll length. */
+#smooth-wrapper {
+  width: 100%;
+}
+
+#intro-canvas {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  touch-action: none;
+}
+
+/* Keeps the frame edges dark so the corridor reads as a space, not a page. */
+.intro-vignette {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+  pointer-events: none;
+  background:
+    radial-gradient(
+      120% 90% at 50% 45%,
+      rgba(19, 19, 25, 0) 45%,
+      rgba(19, 19, 25, 0.55) 78%,
+      rgba(12, 12, 16, 0.92) 100%
+    );
+}
+
+/* --------------------------------------------------------------- copy -- */
+
+.intro-text {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.beat {
+  position: absolute;
+  max-width: min(46vw, 620px);
+}
+
+.beat--left {
+  left: 7vw;
+  top: 50%;
+  transform: translateY(-50%);
+  text-align: left;
+}
+
+.beat--right {
+  right: 7vw;
+  top: 50%;
+  transform: translateY(-50%);
+  text-align: right;
+}
+
+.beat--center {
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  max-width: min(80vw, 900px);
+}
+
+.beat__title {
+  margin: 0;
+  font-family: "Ma Shan Zheng", "华文行楷", "STXingkai", "方正舒体", "FZShuTi",
+    "楷体", "KaiTi", "STKaiti", serif;
+  font-weight: 400;
+  font-size: clamp(2.4rem, 6.4vw, 5.6rem);
+  line-height: 1.05;
+  letter-spacing: 0.02em;
+  color: #fafafa;
+  text-shadow: 0 2px 30px rgba(0, 0, 0, 0.85);
+}
+
+.beat__meta {
+  margin: 0.7rem 0 0;
+  font-size: clamp(0.85rem, 1.5vw, 1.1rem);
+  letter-spacing: 0.22em;
+  color: rgba(255, 255, 255, 0.72);
+  text-shadow: 0 1px 18px rgba(0, 0, 0, 0.8);
+}
+
+.beat--hero .beat__title {
+  font-size: clamp(3rem, 9vw, 8rem);
+}
+
+.beat--hero .beat__meta {
+  margin-top: 1.1rem;
+  letter-spacing: 0.4em;
+}
+
+/* SplitText wraps every glyph in its own element; they have to stay on one
+   line for the vertical fly-in to read. */
+.beat__title > *,
+.beat__title * ,
+.beat__meta > *,
+.beat__meta * {
+  display: inline-block;
+  will-change: transform, opacity;
+}
+
+/* ------------------------------------------------------------- chrome -- */
+
+.intro-hint {
+  position: fixed;
+  left: 50%;
+  bottom: 12vh;
+  z-index: 3;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  transform: translateX(-50%);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 600ms cubic-bezier(0.2, 1, 0.3, 1);
+}
+
+.intro-hint.is-visible {
+  opacity: 1;
+}
+
+.intro-hint.is-gone {
+  opacity: 0;
+}
+
+.intro-hint svg {
+  width: 18px;
+  height: 24px;
+  fill: none;
+  stroke: rgba(255, 255, 255, 0.55);
+  stroke-width: 0.7;
+  animation: intro-hint-drift 2.4s ease-in-out infinite;
+}
+
+.intro-hint span {
+  font-size: 0.72rem;
+  letter-spacing: 0.34em;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+@keyframes intro-hint-drift {
+  0%,
+  100% {
+    transform: translateY(0);
+    opacity: 0.5;
+  }
+  50% {
+    transform: translateY(6px);
+    opacity: 0.95;
+  }
+}
+
+.intro-progress {
+  position: fixed;
+  left: 50%;
+  bottom: 5vh;
+  z-index: 3;
+  width: min(30vw, 300px);
+  transform: translateX(-50%);
+  pointer-events: none;
+}
+
+.intro-progress__rail {
+  position: relative;
+  width: 100%;
+  height: 1px;
+  background: rgba(255, 255, 255, 0.16);
+}
+
+.intro-progress__fill {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 0;
+  height: 100%;
+  background: #fff;
+}
+
+.intro-progress__value {
+  position: absolute;
+  left: 50%;
+  bottom: 100%;
+  margin-bottom: 0.55rem;
+  transform: translateX(-50%);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.66rem;
+  letter-spacing: 0.28em;
+  color: rgba(255, 255, 255, 0.55);
+}
+
+.intro-start {
+  position: fixed;
+  left: 50%;
+  top: 50%;
+  z-index: 4;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 1.6rem 2.4rem;
+  margin: 0;
+  border: 0;
+  background: none;
+  color: #fff;
+  transform: translate(-50%, -50%) scale(0.98);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 500ms cubic-bezier(0.2, 1, 0.3, 1),
+    transform 500ms cubic-bezier(0.2, 1, 0.3, 1);
+}
+
+.intro-start.is-visible {
+  opacity: 1;
+  transform: translate(-50%, -50%) scale(1);
+  pointer-events: auto;
+}
+
+/* A hairline ring instead of a filled button, so the last beat stays visible
+   behind the prompt. */
+.intro-start::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  border-radius: 999px;
+  transition: border-color 400ms cubic-bezier(0.2, 1, 0.3, 1),
+    transform 400ms cubic-bezier(0.2, 1, 0.3, 1);
+}
+
+.intro-start:hover::before,
+.intro-start:focus-visible::before {
+  border-color: rgba(255, 255, 255, 0.55);
+  transform: scale(1.04);
+}
+
+.intro-start__label {
+  font-family: "Ma Shan Zheng", "华文行楷", "STXingkai", "方正舒体", "FZShuTi",
+    "楷体", "KaiTi", "STKaiti", serif;
+  font-size: clamp(2rem, 4vw, 3rem);
+  line-height: 1;
+  letter-spacing: 0.14em;
+  text-indent: 0.14em;
+}
+
+.intro-start__hint {
+  font-size: 0.7rem;
+  letter-spacing: 0.32em;
+  text-indent: 0.32em;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.intro-skip {
+  position: fixed;
+  top: 5vh;
+  right: 5vw;
+  z-index: 4;
+  padding: 0.45rem 0.9rem;
+  margin: 0;
+  border: 0;
+  background: none;
+  font-size: 0.72rem;
+  letter-spacing: 0.28em;
+  text-indent: 0.28em;
+  color: rgba(255, 255, 255, 0.42);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 500ms cubic-bezier(0.2, 1, 0.3, 1),
+    color 300ms cubic-bezier(0.2, 1, 0.3, 1);
+}
+
+.intro-skip.is-visible {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.intro-skip:hover,
+.intro-skip:focus-visible {
+  color: rgba(255, 255, 255, 0.9);
+}
+
+/* ------------------------------------------------------- loader / exit -- */
+
+.intro-loader {
+  position: fixed;
+  inset: 0;
+  z-index: 10;
+  background: #131319;
+  transition: opacity 700ms cubic-bezier(0.2, 1, 0.3, 1);
+}
+
+.intro-loader.is-gone {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.intro-loader span {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 120px;
+  height: 1px;
+  margin: -0.5px 0 0 -60px;
+  background: rgba(255, 255, 255, 0.85);
+  transform-origin: 0% 50%;
+  animation: intro-loader 1.5s ease-in-out infinite alternate forwards;
+}
+
+@keyframes intro-loader {
+  0% {
+    transform: scaleX(0);
+    transform-origin: 0% 50%;
+  }
+  50% {
+    transform: scaleX(1);
+    transform-origin: 0% 50%;
+  }
+  50.1% {
+    transform: scaleX(1);
+    transform-origin: 100% 50%;
+  }
+  100% {
+    transform: scaleX(0);
+    transform-origin: 100% 50%;
+  }
+}
+
+.intro-curtain {
+  position: fixed;
+  inset: 0;
+  z-index: 20;
+  background: #0b0b0f;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 420ms cubic-bezier(0.33, 0, 0.2, 1);
+}
+
+.intro-curtain.is-on {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+@media (max-width: 53em) {
+  .beat {
+    max-width: 74vw;
+  }
+
+  .beat--left,
+  .beat--right {
+    left: 7vw;
+    right: auto;
+    text-align: left;
+  }
+
+  .intro-progress {
+    width: 60vw;
+  }
+
+  .intro-skip {
+    top: 3.5vh;
+    right: 6vw;
+  }
+}

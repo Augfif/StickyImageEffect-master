@@ -44,6 +44,14 @@ body {
     rgba(8, 8, 11, 0.6) 72%,
     rgba(8, 8, 11, 0) 100%
   );
+  transition: opacity 600ms cubic-bezier(0.2, 1, 0.3, 1);
+}
+
+/* While the glass pane is open the copy has already moved up off the scrim,
+   and a near opaque dark layer right behind the pane would just kill the
+   glass, so it steps aside for as long as we are reading. */
+body.is-reading #app::after {
+  opacity: 0;
 }
 
 canvas {
@@ -100,6 +108,19 @@ canvas {
   transition: transform 1300ms cubic-bezier(0.2, 1, 0.3, 1), opacity 500ms cubic-bezier(0.2, 1, 0.3, 1);
 }
 
+/* Title + meta travel together to the middle of the screen, so they are
+   wrapped in a group that hugs its widest line: centring that box centres
+   the copy without touching a flex alignment (which cannot be animated).
+   While reading, js/Slides.js writes the transform/opacity here. */
+.slide-copy {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  width: fit-content;
+  max-width: 100%;
+  will-change: transform, opacity;
+}
+
 .slide-meta {
   margin: 0;
   font-size: clamp(0.85rem, 3.6vw, 1.15rem);
@@ -115,18 +136,74 @@ canvas {
   transition: opacity 900ms cubic-bezier(0.2, 1, 0.3, 1);
 }
 
+/* The meta floats up together with the title, so it carries a transform
+   transition too -- spelled out in both the hidden and the shown state, or the
+   fade rules would drop it. */
+.slide-meta {
+  transition: opacity 900ms cubic-bezier(0.2, 1, 0.3, 1),
+    transform 420ms cubic-bezier(0.2, 1, 0.3, 1);
+}
+
 .show-meta .slide-meta,
 .show-meta .slide-more {
   opacity: 1;
   transition: opacity 1500ms 300ms cubic-bezier(0.2, 1, 0.3, 1);
 }
 
+.show-meta .slide-meta {
+  transition: opacity 1500ms 300ms cubic-bezier(0.2, 1, 0.3, 1),
+    transform 420ms cubic-bezier(0.2, 1, 0.3, 1);
+}
+
+/* Hovering the copy floats the whole block up, so the text reads as lifting
+   inside the cursor ring. Deliberately no scale: a 5rem brush glyph goes soft
+   the moment it is scaled. While the glass pane is open js writes a transform
+   on .slide-copy itself -- a different element -- so hovering the centred copy
+   cannot fight the animation the panel is driving. */
+.slide-copy:hover .slide-title,
+.slide-copy:hover .slide-meta {
+  transform: translateY(-6px);
+}
+
+/* Sheet open: the copy is being centred, the button steps aside. */
+.is-reading .slide-copy {
+  pointer-events: none;
+}
+
+.is-reading .slide-more {
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* Reading centres the copy over the photo itself, so it needs its own shadow
+   to stay legible there (desktop normally has none, the copy sits on the dark
+   left column instead). */
+.is-reading .slide-title,
+.is-reading .slide-meta {
+  text-shadow: 0 2px 24px rgba(0, 0, 0, 0.8);
+}
+
 .slide-more {
+  /* A <button> now, not a link: strip the native chrome but keep the look.
+     `appearance: none` alone does NOT drop the border the UA draws around a
+     button, so the whole box has to be reset before the underline goes back in
+     -- otherwise a 2px outset frame sits around the label. */
+  -webkit-appearance: none;
+  appearance: none;
+  background: none;
+  border: 0;
+  margin: 0;
+  padding: 0;
+  font: inherit;
+  color: var(--color-link);
+  cursor: pointer;
   border-bottom: 1px solid;
   text-shadow: 0 1px 12px rgba(0, 0, 0, 0.75);
 }
 
-.slide-more:hover {
+.slide-more:hover,
+.slide-more:focus-visible {
+  color: var(--color-link-hover);
   border-bottom: 1px solid transparent;
 }
 
@@ -138,7 +215,8 @@ canvas {
   text-indent: -0.5vw;
   font-family: gibbs, sans-serif;
   font-weight: 900;
-  transition: color 500ms cubic-bezier(0.2, 1, 0.3, 1);
+  transition: color 500ms cubic-bezier(0.2, 1, 0.3, 1),
+    transform 420ms cubic-bezier(0.2, 1, 0.3, 1);
 }
 
 .slide--cjk .slide-title,
@@ -160,6 +238,10 @@ canvas {
 .prev,
 .next {
   opacity: 0;
+  /* The neighbours overlap the active slide heavily (next only sits 15% away,
+     prev 85%), so without this an invisible slide would swallow the hover that
+     belongs to the copy on screen. */
+  pointer-events: none;
 }
 
 .prev {
@@ -236,12 +318,13 @@ canvas {
 .progress__knob {
   position: absolute;
   left: 50%;
-  bottom: calc(var(--progress) * (100% - 18px));
+  /* First slide at the top of the rail, last one at the bottom. */
+  top: calc(var(--progress) * (100% - 18px));
   width: 3px;
   height: 18px;
   margin-left: -1.5px;
   background: #fff;
-  transition: bottom 400ms cubic-bezier(0.2, 1, 0.3, 1);
+  transition: top 400ms cubic-bezier(0.2, 1, 0.3, 1);
 }
 
 .progress--instant .progress__knob {
@@ -249,14 +332,202 @@ canvas {
 }
 
 .progress__label {
-  position: relative;
-  margin-top: 0.6rem;
+  /* Level with the middle of the rail and just left of it, so the count never
+     fights the knob for the same spot. The rail is ~2px wide and the sidebar
+     does not clip, so the label simply hangs out to its left. */
+  position: absolute;
+  top: 50%;
+  right: calc(100% + 0.75rem);
+  transform: translateY(-50%);
   font-size: 1.05rem;
   font-style: italic;
   font-weight: 700;
   line-height: 1;
   white-space: nowrap;
   color: #fff;
+}
+
+/* ---------------------------------------------------------------- sheet */
+/* The slide's long copy as a content layer, not a dialog: a plain white block
+   anchored to the bottom of the viewport that js/Sheet.js drives with a single
+   translateY. The peek state leaves 35vh of white showing, the top of the drag
+   range puts its edge at the top of the screen. Nothing dims the photo, the
+   two simply meet at the seam -- hence no radius, no shadow, no scrim, and the
+   close button parked on that seam instead of floating in a corner. */
+/* Frosted glass instead of flat white: the photo behind the panel is blurred
+   and tinted, so the two really do read as one picture. Plain css, no
+   dependency -- backdrop-filter samples everything painted underneath, the
+   WebGL canvas included. The white gets denser further down so the article
+   text keeps its contrast while the top of the pane stays see-through. */
+.sheet {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 5;
+  /* At least one viewport tall, then it grows with the copy so a long article
+     is revealed by dragging this same single layer. */
+  min-height: 100vh;
+  min-height: 100dvh;
+  background: linear-gradient(
+    to bottom,
+    rgba(255, 255, 255, 0.45) 0%,
+    rgba(255, 255, 255, 0.74) 38%,
+    rgba(255, 255, 255, 0.88) 100%
+  );
+  /* The frost is a ramp, not a state: at rest the pane is plain glass, and the
+     radius only grows while .is-open is on -- so the photo behind it never
+     snaps from sharp to blurred, which is what made the reveal feel abrupt. */
+  -webkit-backdrop-filter: blur(0px) saturate(100%);
+  backdrop-filter: blur(0px) saturate(100%);
+  transition: -webkit-backdrop-filter 900ms cubic-bezier(0.33, 0, 0.2, 1),
+    backdrop-filter 900ms cubic-bezier(0.33, 0, 0.2, 1);
+  color: #17171c;
+  visibility: hidden;
+  pointer-events: none;
+  cursor: grab;
+  touch-action: none;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  will-change: transform;
+  transform: translateY(100%);
+}
+
+.sheet.is-visible {
+  visibility: visible;
+}
+
+.sheet.is-open {
+  pointer-events: auto;
+  -webkit-backdrop-filter: blur(26px) saturate(150%);
+  backdrop-filter: blur(26px) saturate(150%);
+}
+
+.sheet.is-dragging {
+  cursor: grabbing;
+}
+
+/* Phones have far less gpu to spend on re-blurring a full-height pane every
+   frame, so the radius comes down a notch there. */
+@media (max-width: 53em) {
+  .sheet.is-open {
+    -webkit-backdrop-filter: blur(18px) saturate(140%);
+    backdrop-filter: blur(18px) saturate(140%);
+  }
+}
+
+/* Someone who told the os they do not want translucency gets flat white. */
+@media (prefers-reduced-transparency: reduce) {
+  .sheet,
+  .sheet.is-open {
+    background: #fff;
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+}
+
+/* Same ramp, on the shortened clock the reduced motion path uses. */
+@media (prefers-reduced-motion: reduce) {
+  .sheet {
+    transition-duration: 300ms;
+  }
+}
+
+/* Floats just above the seam, on the photo side. js/Sheet.js walks it up with
+   the seam and parks it near the top of the screen once the panel fills it.
+   It carries its own translucent disc: a bare white cross disappears into the
+   busier parts of the photo, the disc keeps it readable wherever it lands. */
+.sheet__close {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: 52px;
+  height: 52px;
+  margin: 0;
+  padding: 0;
+  border: 1.5px solid rgba(255, 255, 255, 0.55);
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.42);
+  -webkit-appearance: none;
+  appearance: none;
+  cursor: pointer;
+  transform: translate(-50%, -50%);
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.45);
+  transition: transform 300ms cubic-bezier(0.2, 1, 0.3, 1),
+    background 300ms cubic-bezier(0.2, 1, 0.3, 1),
+    border-color 300ms cubic-bezier(0.2, 1, 0.3, 1);
+}
+
+.sheet__close::before,
+.sheet__close::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 36px;
+  height: 2.5px;
+  border-radius: 2px;
+  background: #fff;
+  transform: translate(-50%, -50%) rotate(45deg);
+}
+
+.sheet__close::after {
+  transform: translate(-50%, -50%) rotate(-45deg);
+}
+
+/* The panel has filled the screen: the button is over the white glass now, so
+   it flips to a light disc with dark ink instead of a dark one with white. */
+.sheet__close.is-parked {
+  background: rgba(23, 23, 28, 0.07);
+  border-color: rgba(23, 23, 28, 0.16);
+  box-shadow: none;
+}
+
+.sheet__close.is-parked::before,
+.sheet__close.is-parked::after {
+  background: #17171c;
+}
+
+.sheet__close:hover,
+.sheet__close:focus-visible {
+  transform: translate(-50%, -50%) scale(1.12);
+  background: rgba(0, 0, 0, 0.6);
+  border-color: rgba(255, 255, 255, 0.85);
+}
+
+.sheet__close.is-parked:hover,
+.sheet__close.is-parked:focus-visible {
+  background: rgba(23, 23, 28, 0.14);
+  border-color: rgba(23, 23, 28, 0.28);
+}
+
+.sheet__body {
+  max-width: 68ch;
+  margin: 0 auto;
+  /* Top padding clears the lower half of the seam cross. */
+  padding: 2.6rem 1.4rem calc(2rem + env(safe-area-inset-bottom, 0px));
+  /* The panel drags from anywhere, but text should still be selectable. */
+  cursor: auto;
+  -webkit-user-select: text;
+  user-select: text;
+}
+
+.sheet__title {
+  margin: 0 0 1rem;
+  font-family: "Ma Shan Zheng", "华文行楷", "STXingkai", "方正舒体", "FZShuTi",
+    "楷体", "KaiTi", "STKaiti", serif;
+  font-size: clamp(1.8rem, 7vw, 2.4rem);
+  font-weight: 400;
+  letter-spacing: 0.02em;
+  color: #17171c;
+}
+
+.sheet__content {
+  font-size: 1rem;
+  line-height: 1.9;
 }
 
 /* Desktop / large tablet: the original composition. The focus crop leaves a
@@ -321,14 +592,22 @@ canvas {
   }
 
   .progress__knob {
-    bottom: calc(var(--progress) * (100% - 28px));
+    top: calc(var(--progress) * (100% - 28px));
     width: 4px;
     height: 28px;
     margin-left: -2px;
   }
 
   .progress__label {
-    margin-top: 1rem;
+    right: calc(100% + 1rem);
     font-size: 1.5rem;
+  }
+
+  .sheet__body {
+    padding: 3.6rem 3rem calc(2.5rem + env(safe-area-inset-bottom, 0px));
+  }
+
+  .sheet__title {
+    font-size: 2.2rem;
   }
 }

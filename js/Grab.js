@@ -1,3 +1,12 @@
+// The slideshow gesture owns the whole window, so anything that wants its own
+// pointer handling has to be carved out: the "Read more" button and the copy
+// sheet both do. They are skipped before the touch listener's preventDefault()
+// so a tap still turns into a normal click on phones.
+function isOwnPointerTarget(target) {
+  if (!target || typeof target.closest !== "function") return false;
+  return !!(target.closest(".slide-more") || target.closest(".sheet"));
+}
+
 class Grab {
   constructor({
     indexSize,
@@ -9,6 +18,10 @@ class Grab {
     this.onGrabEnd = onGrabEnd;
     this.onGrabStart = onGrabStart;
     this.onGrabMove = onGrabMove;
+
+    // Turned off while the copy sheet is open, so no drag state is ever
+    // created from a press on the photo behind it.
+    this.disabled = false;
 
     this.scroll = {
       start: 0,
@@ -24,9 +37,21 @@ class Grab {
     this.listen("touchmove", this.onMouseMove.bind(this), true);
     this.listen(["touchend", "touchcancel"], this.onMouseUp.bind(this), true);
   }
+  setEnabled(enabled) {
+    this.disabled = !enabled;
+    if (this.disabled) {
+      this.scroll.start = null;
+      this.scroll.current = null;
+      this.scroll.delta = null;
+    }
+  }
   listen(events, grabListener, isTouch) {
+    const grab = this;
+
     let mouseListener = function (ev) {
       if (ev.type === "mouseout" && ev.relatedTarget != null) return;
+      if (grab.disabled) return;
+      if (isOwnPointerTarget(ev.target)) return;
       grabListener({
         y: ev.clientY
       });
@@ -36,6 +61,8 @@ class Grab {
       // if (ev.type === "touchend") {
       //   throw new Error(ev.targetTouches);
       // }
+      if (grab.disabled) return;
+      if (isOwnPointerTarget(ev.target)) return;
       ev.preventDefault();
       grabListener({
         y: ev.targetTouches[0] ? ev.targetTouches[0].clientY : null

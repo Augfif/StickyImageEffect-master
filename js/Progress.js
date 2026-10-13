@@ -6,8 +6,10 @@ const createEleWithClass = (tag, className) => {
 
 /**
  * Vertical progress sidebar: up arrow, track + knob, "current / total"
- * label and a down arrow. The arrows are decorative, the whole element is
- * pointer-events: none so it never blocks the click & drag interaction.
+ * label sitting level with the middle of the track, and a down arrow. The
+ * first slide is the top of the track, the last one its bottom. The arrows
+ * are decorative, the whole element is pointer-events: none so it never
+ * blocks the click & drag interaction.
  */
 class Progress {
   constructor(total) {
@@ -21,10 +23,12 @@ class Progress {
       "progress__arrow progress__arrow--down"
     );
 
+    // The label lives inside the track so css can pin it to the track's
+    // vertical middle, just left of the rail.
     this.track.appendChild(this.knob);
+    this.track.appendChild(this.label);
     this.container.appendChild(this.up);
     this.container.appendChild(this.track);
-    this.container.appendChild(this.label);
     this.container.appendChild(this.down);
 
     this.total = Math.max(total, 1);
@@ -59,7 +63,7 @@ class Progress {
     this.dragging = dragging;
     this.apply(dragging ? 0.5 : this.positionFor(this.index), true);
   }
-  // 0 = first slide at the bottom of the track, 1 = last slide at the top.
+  // 0 = first slide at the top of the track, 1 = last slide at the bottom.
   positionFor(index) {
     return index / Math.max(this.total - 1, 1);
   }

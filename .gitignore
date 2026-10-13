@@ -10,6 +10,10 @@ dist
 fake3d-master/
 ultranoir-dump/
 ultranoir-site/
+# codrops-cinematic-scroll-animations-main/
+#   开场页的参考工程（Codrops《Cinematic 3D Scroll Experiences》），带 Midjourney
+#   图片与 3MB 模型，只作为形式参考，不随仓库分发
+codrops-cinematic-scroll-animations-main/
 
 # 本地临时文件
 _*
