@@ -98,7 +98,7 @@ function wireScroll() {
     smoother = ScrollSmoother.create({
       wrapper: "#smooth-wrapper",
       content: "#smooth-content",
-      smooth: 1.2,
+      smooth: 0.72,
       effects: false,
       smoothTouch: 0.1
     });

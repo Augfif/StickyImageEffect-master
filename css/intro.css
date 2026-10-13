@@ -3,7 +3,8 @@
    bottom rail, the start prompt and the loader. */
 
 .intro {
-  background: #131319;
+  background:
+    radial-gradient(circle at 50% 42%, #22222b 0, #17171e 46%, #0d0d11 100%);
   color: #fff;
   overflow-x: hidden;
 }
@@ -56,8 +57,8 @@ html::-webkit-scrollbar {
     radial-gradient(
       120% 90% at 50% 45%,
       rgba(19, 19, 25, 0) 45%,
-      rgba(19, 19, 25, 0.55) 78%,
-      rgba(12, 12, 16, 0.92) 100%
+      rgba(19, 19, 25, 0.38) 78%,
+      rgba(12, 12, 16, 0.84) 100%
     );
 }
 

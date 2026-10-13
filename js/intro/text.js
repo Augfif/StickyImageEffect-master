@@ -110,7 +110,7 @@ export function heroExitTimeline(heroEl, heroChars, scrollEl) {
       trigger: scrollEl,
       start: "0% top",
       end: "5% top",
-      scrub: 0.4
+      scrub: 0.28
     }
   }).to(heroChars, {
     y: -26,
@@ -129,7 +129,7 @@ export function beatTimeline(chars, scrollEl, startPercent, endPercent) {
         trigger: scrollEl,
         start: `${startPercent}% top`,
         end: `${endPercent}% top`,
-        scrub: 0.5
+        scrub: 0.28
       }
     })
     .fromTo(chars, IN_FROM, {

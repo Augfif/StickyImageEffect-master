@@ -45,7 +45,6 @@ export function createIntroScene(canvas, beats, options = {}) {
 
   const scene = new THREE.Scene();
   scene.background = new THREE.Color(BACKGROUND);
-  scene.fog = new THREE.Fog(BACKGROUND, 16, 82);
 
   const camera = new THREE.PerspectiveCamera(46, 1, 0.1, 240);
   scene.add(camera);
@@ -78,8 +77,7 @@ export function createIntroScene(canvas, beats, options = {}) {
       transparent: true,
       opacity: 0.5,
       depthWrite: false,
-      side: THREE.DoubleSide,
-      fog: true
+      side: THREE.DoubleSide
     });
     const mesh = new THREE.Mesh(geometry, material);
     group.add(mesh);
@@ -89,8 +87,7 @@ export function createIntroScene(canvas, beats, options = {}) {
       new THREE.LineBasicMaterial({
         color: 0xffffff,
         transparent: true,
-        opacity: 0.22,
-        fog: true
+        opacity: 0.22
       })
     );
     group.add(frame);
@@ -104,8 +101,7 @@ export function createIntroScene(canvas, beats, options = {}) {
         transparent: true,
         opacity: 0.05,
         depthWrite: false,
-        side: THREE.DoubleSide,
-        fog: true
+        side: THREE.DoubleSide
       })
     );
     halo.position.z = -0.2;
@@ -177,8 +173,10 @@ export function createIntroScene(canvas, beats, options = {}) {
     texture.minFilter = THREE.LinearFilter;
     texture.magFilter = THREE.LinearFilter;
     texture.generateMipmaps = false;
+    texture.anisotropy = renderer.capabilities.getMaxAnisotropy();
     texture.wrapS = THREE.ClampToEdgeWrapping;
     texture.wrapT = THREE.ClampToEdgeWrapping;
+    texture.needsUpdate = true;
     fitPlane(entry, texture);
     entry.material.map = texture;
     entry.material.color.set(0xffffff);
@@ -220,11 +218,12 @@ export function createIntroScene(canvas, beats, options = {}) {
     for (let i = 0; i < planes.length; i++) {
       const plane = planes[i];
       const distance = Math.abs(active - i);
-      // The beat the camera is parked on stays bright, its neighbours fall
-      // back, and anything further away is fog anyway.
+      // Keep the focused photo crisp. A small ambient alpha preserves the
+      // corridor rhythm, while the old 0.45 floor made several photos blend
+      // together and look blurred during a fast scroll.
       const focus = 1 - clamp(distance, 0, 1);
-      const target = 0.45 + 0.55 * focus * focus;
-      plane.opacity = lerp(plane.opacity, target, 0.12);
+      const target = 0.035 + 0.965 * Math.pow(focus, 1.6);
+      plane.opacity = lerp(plane.opacity, target, 0.24);
       plane.material.opacity = plane.opacity;
       if (plane.halo) {
         plane.halo.material.opacity = 0.05 * plane.opacity;
