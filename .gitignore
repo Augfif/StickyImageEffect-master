@@ -17,3 +17,6 @@ codrops-cinematic-scroll-animations-main/
 
 # 本地临时文件
 _*
+README copy.md
+.dev-server.out.log
+.dev-server.err.log
