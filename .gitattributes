@@ -1,0 +1,19 @@
+# 二进制素材：不做行尾转换、不参与文本 diff/合并。
+# 仓库在 Windows（core.autocrlf=true）上检出时，缺少这些声明会让
+# 被误判为文本的 PNG 遭到 CRLF 转换而损坏。
+*.png   binary
+*.jpg   binary
+*.jpeg  binary
+*.gif   binary
+*.webp  binary
+*.ico   binary
+*.woff  binary
+*.woff2 binary
+
+# 文本文件统一在仓库里用 LF 存储。
+*.html  text
+*.css   text
+*.js    text
+*.mjs   text
+*.json  text
+*.md    text
