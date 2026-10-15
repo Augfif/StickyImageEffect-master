@@ -45,12 +45,21 @@
     <span class="intro-progress__value" id="intro-progress-value">000%</span>
   </div>
 
-  <button class="intro-start" id="intro-start" type="button">
-    <span class="intro-start__label" id="intro-start-label"></span>
-    <span class="intro-start__hint" id="intro-start-hint"></span>
-  </button>
+  <!-- The two doors at the end of the scroll. Both start out unfocusable
+       (tabindex="-1") and are made reachable when they fade in, see
+       revealActions() in js/intro/index.js. -->
+  <div class="intro-actions" id="intro-actions">
+    <button class="intro-action" id="intro-action-main" type="button" tabindex="-1">
+      <span class="intro-action__label" id="intro-action-main-label"></span>
+      <span class="intro-action__hint" id="intro-action-main-hint"></span>
+    </button>
+    <button class="intro-action" id="intro-action-ai" type="button" tabindex="-1">
+      <span class="intro-action__label" id="intro-action-ai-label"></span>
+      <span class="intro-action__hint" id="intro-action-ai-hint"></span>
+    </button>
+  </div>
 
-  <button class="intro-skip" id="intro-skip" type="button"></button>
+  <button class="intro-skip" id="intro-skip" type="button" tabindex="-1"></button>
 
   <div class="intro-loader" id="intro-loader"><span></span></div>
   <div class="intro-curtain" id="intro-curtain"></div>

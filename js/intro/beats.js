@@ -29,8 +29,12 @@ export const introBeats = [
 export const introCopy = {
   title: "土家织锦",
   subtitle: "十幅纹样，十种祝愿",
-  cta: "开始",
-  ctaHint: "点击进入",
+  // The two doors at the end of the scroll. `hint` is the small second line
+  // inside the ring -- keep it short enough to sit on one line.
+  actions: {
+    main: { label: "赏织锦", hint: "浏览织锦纹样" },
+    ai: { label: "AI 互动", hint: "即将上线" }
+  },
   skip: "跳过",
   scrollHint: "向下滚动"
 };
