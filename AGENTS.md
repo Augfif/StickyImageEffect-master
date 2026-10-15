@@ -13,7 +13,7 @@
 
 | 依赖 | 版本 | 用途 |
 | --- | --- | --- |
-| `vite` | ^5.4.21 | 开发服务器与打包，双入口 |
+| `vite` | ^5.4.21 | 开发服务器与打包，三个入口 |
 | `three` | ^0.101.1 | 两页的 WebGL 渲染（**r101，老版本，见下文坑位**） |
 | `gsap` | ^3.15.0 | 开场页：`ScrollTrigger` / `ScrollSmoother` / `SplitText` |
 | `popmotion` | ^8.6.4 | 幻灯片：`spring` / `parallel` 做手势回弹 |
@@ -30,15 +30,20 @@ npm run depth:setup  # 装 tools/depth 自己的依赖（sharp + transformers）
 npm run depth        # 同步 tujia/ → 缩放 → 生成深度图；--force 全量重算
 ```
 
-两个入口共用同一个 dev server，配置在 [vite.config.js](vite.config.js)。
+三个入口共用同一个 dev server，配置在 [vite.config.js](vite.config.js)。
 
-## 架构：两个页面，两条渲染管线
+## 架构：三个页面，两条渲染管线
 
 | 入口 | HTML | JS 入口 | 说明 |
 | --- | --- | --- | --- |
 | 开场页 | [index.html](index.html) | `js/intro/index.js` | 电影感「走廊」自动播放 + 滚动推进十条内容 |
 | 主界面 | [main.html](main.html) | `js/index.js` | 可拖动切换的 sticky 视差幻灯片（五张照片） |
+| AI 页 | [ai.html](ai.html) | `js/ai/index.js` | 目前只是空壳：暗色空间 + 「即将上线」，活动本身尚未实现 |
 | — | [base.html](base.html) | — | 原始 Codrops 模板页，**不在 build 入口里，当前不可运行**，仅作历史参考 |
+
+导航只从开场页末尾发出去：那里并排两个按钮（「赏织锦」→ `main.html`，「AI 互动」→ `ai.html`），
+右上角「跳过」平滑滚到这一屏而不是跳页面。AI 页的「返回」用 `index.html?at=end` 回到同一屏，
+该参数会跳过开场推镜直接落位。改这两个去向看 `js/intro/index.js` 的 `ROUTES`。
 
 `base.html` 用普通 `<script src="js/index.js">` 引入，而现代码是 ES module，
 所以它跑不起来；保留它只是为了对照上游模板。
@@ -46,7 +51,8 @@ npm run depth        # 同步 tujia/ → 缩放 → 生成深度图；--force �
 ### 目录地图
 
 ```
-index.html main.html        # 两个入口
+index.html main.html        # 幻灯片与开场页
+ai.html                     # AI 活动页（占位）
 base.html                   # 遗留模板页，不构建
 css/
   base.css                  # reset + 配色变量 + 自定义光标 + 加载动画
