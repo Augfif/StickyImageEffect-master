@@ -1,0 +1,88 @@
+/* The AI page's shell. It loads base.css, never intro.css: every rule in there
+   is about a scrolling film this page does not have. */
+
+/* Self hosted here rather than inherited from css/styles.css: the opener never
+   loads that file, so it draws its brush titles with whatever calligraphy face
+   the machine happens to have, while this page should look the same on the
+   judging laptop as it does here. Declaring it here leaves the opener alone. */
+@font-face {
+  font-family: "Ma Shan Zheng";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("../fonts/MaShanZheng-Regular.woff2") format("woff2");
+}
+
+html,
+body {
+  height: 100%;
+}
+
+/* The same room as the opener, so stepping through the door reads as walking
+   into the next space rather than leaving the building. */
+.ai {
+  margin: 0;
+  background:
+    radial-gradient(circle at 50% 42%, #22222b 0, #17171e 46%, #0d0d11 100%);
+  color: #fff;
+  overflow: hidden;
+}
+
+/* Sits where the opener's skip button sits, and looks like it. */
+.ai__back {
+  position: fixed;
+  top: 5vh;
+  right: 5vw;
+  z-index: 2;
+  padding: 0.45rem 0.9rem;
+  font-size: 0.72rem;
+  letter-spacing: 0.28em;
+  text-indent: 0.28em;
+  color: rgba(255, 255, 255, 0.42);
+  transition: color 300ms cubic-bezier(0.2, 1, 0.3, 1);
+}
+
+.ai__back:hover,
+.ai__back:focus-visible {
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.ai__stage {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1.1rem;
+  padding: 0 8vw;
+  text-align: center;
+}
+
+.ai__title {
+  margin: 0;
+  font-family: "Ma Shan Zheng", "华文行楷", "STXingkai", "方正舒体", "FZShuTi",
+    "楷体", "KaiTi", "STKaiti", serif;
+  font-weight: 400;
+  font-size: clamp(3rem, 9vw, 8rem);
+  line-height: 1.05;
+  letter-spacing: 0.02em;
+  color: #fafafa;
+  text-shadow: 0 2px 30px rgba(0, 0, 0, 0.85);
+}
+
+.ai__meta {
+  margin: 0;
+  font-size: clamp(0.85rem, 1.5vw, 1.1rem);
+  letter-spacing: 0.4em;
+  text-indent: 0.4em;
+  color: rgba(255, 255, 255, 0.72);
+  text-shadow: 0 1px 18px rgba(0, 0, 0, 0.8);
+}
+
+@media (max-width: 53em) {
+  .ai__back {
+    top: 3.5vh;
+    right: 6vw;
+  }
+}
