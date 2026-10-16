@@ -299,6 +299,16 @@ html::-webkit-scrollbar {
   text-indent: 0.14em;
 }
 
+/* Latin inside a brush face is set at the same em but reads much larger: the
+   face in use here draws "AI" 1.19 hanzi wide, and the word space after it ate
+   another third of a glyph. 0.78em puts the pair back at roughly one glyph's
+   width, so "AI" and "互动" finally look like three things of one size. The
+   margin is the gap the space used to provide, at the smaller scale. */
+.intro-action__label .latin {
+  font-size: 0.78em;
+  margin-right: 0.16em;
+}
+
 .intro-action__hint {
   font-size: 0.7rem;
   letter-spacing: 0.32em;

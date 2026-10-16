@@ -50,11 +50,13 @@ const ROUTES = {
 };
 
 document.getElementById("intro-hint-label").textContent = introCopy.scrollHint;
-document.getElementById("intro-action-main-label").textContent =
+// innerHTML, not textContent: a label may carry the `.latin` span that sizes
+// latin runs down to the brush face, see the comment on introCopy.actions.
+document.getElementById("intro-action-main-label").innerHTML =
   introCopy.actions.main.label;
 document.getElementById("intro-action-main-hint").textContent =
   introCopy.actions.main.hint;
-document.getElementById("intro-action-ai-label").textContent =
+document.getElementById("intro-action-ai-label").innerHTML =
   introCopy.actions.ai.label;
 document.getElementById("intro-action-ai-hint").textContent =
   introCopy.actions.ai.hint;
@@ -261,9 +263,14 @@ async function boot() {
 
   if (atEnd) {
     lockScroll(false);
-    // The beat windows are measured off the scroll length, and the skip button
-    // is hidden here, so all that is left is to put the scroll where the doors
-    // live. No animation: the reader asked to arrive, not to travel.
+    // The skip button is the way back down, so it has to be armed here too:
+    // the reader can still scroll up into the corridor from the doors, and
+    // without this it stayed hidden for the whole way back. The scroll trigger
+    // keeps it out of sight while the doors themselves are on screen.
+    scrollReady = true;
+    // The beat windows are measured off the scroll length, so all that is left
+    // is to put the scroll where the doors live. No animation: the reader
+    // asked to arrive, not to travel.
     ScrollTrigger.refresh();
     if (smoother) smoother.scrollTop(endScroll());
     else window.scrollTo(0, endScroll());

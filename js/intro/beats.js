@@ -31,9 +31,14 @@ export const introCopy = {
   subtitle: "十幅纹样，十种祝愿",
   // The two doors at the end of the scroll. `hint` is the small second line
   // inside the ring -- keep it short enough to sit on one line.
+  //
+  // A label may carry markup. `.latin` wraps a run of latin letters so css can
+  // bring it down to the width of one brush glyph: the opener draws its copy in
+  // STXingkai, whose latin is both wider and heavier than its chinese, and an
+  // unmarked "AI" ended up occupying a glyph and a half next to the 互动.
   actions: {
     main: { label: "赏织锦", hint: "浏览织锦纹样" },
-    ai: { label: "AI 互动", hint: "即将上线" }
+    ai: { label: '<span class="latin">AI</span>互动', hint: "即将上线" }
   },
   skip: "跳过",
   scrollHint: "向下滚动"
