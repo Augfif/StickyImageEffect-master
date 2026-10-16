@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Grid to Preview — starter</title>
+    <link rel="stylesheet" href="./grid-preview.css" />
+  </head>
+
+  <body class="gp-loading">
+    <!-- Only the grid is authored here: createGridPreview() builds both preview
+         panes from these tiles, so the tile list and the picture list have one
+         home.
+
+         Eight tiles is not decoration. The layout is 4 columns x 2 rows and the
+         halves are split by `i % 4`, which is what gives each of the two panes a
+         2x2 quadrant to cover. Tiles 6-8 are placeholders: this project has five
+         织锦 photos so far.
+
+         Pictures live in ./assets/. A tile may carry extra `data-detail` images;
+         the pane then cross fades through them while the tile is hovered:
+
+           <img src="./assets/tile-1-detail-1.jpg" alt="" data-detail />
+      -->
+    <div class="gp" id="grid">
+      <ul class="gp__grid">
+        <li class="gp__tile" data-index="0" data-title="岩墙花" data-meta="最难岩墙椅子花">
+          <img src="./assets/tile-1.jpg" alt="岩墙花" width="1536" height="2048" />
+        </li>
+        <li class="gp__tile" data-index="1" data-title="九朵梅" data-meta="九梅含韧久安康">
+          <img src="./assets/tile-2.jpg" alt="九朵梅" width="1536" height="2048" />
+        </li>
+        <li class="gp__tile" data-index="2" data-title="椅子花" data-meta="椅织锦纹藏巧艺">
+          <img src="./assets/tile-3.jpg" alt="椅子花" width="1536" height="2048" />
+        </li>
+        <li class="gp__tile" data-index="3" data-title="鲤鱼跃龙门" data-meta="鲤跃锦图盼前程">
+          <img src="./assets/tile-4.jpg" alt="鲤鱼跃龙门" width="2048" height="1310" />
+        </li>
+        <li class="gp__tile" data-index="4" data-title="阳雀鸟" data-meta="阳雀成双载希望">
+          <img src="./assets/tile-5.jpg" alt="阳雀鸟" width="1536" height="2048" />
+        </li>
+        <li class="gp__tile" data-index="5" data-title="纹样待补" data-meta="">
+          <img src="./assets/tile-6.jpg" alt="" width="1024" height="1536" />
+        </li>
+        <li class="gp__tile" data-index="6" data-title="纹样待补" data-meta="">
+          <img src="./assets/tile-7.jpg" alt="" width="1024" height="1536" />
+        </li>
+        <li class="gp__tile" data-index="7" data-title="纹样待补" data-meta="">
+          <img src="./assets/tile-8.jpg" alt="" width="1024" height="1536" />
+        </li>
+      </ul>
+    </div>
+
+    <script type="module">
+      import { createGridPreview, preloadImages } from "./grid-preview.js";
+
+      createGridPreview(document.getElementById("grid"));
+
+      preloadImages(document.querySelectorAll(".gp img")).then(() => {
+        document.body.classList.remove("gp-loading");
+      });
+    </script>
+  </body>
+</html>

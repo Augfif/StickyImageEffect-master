@@ -1,0 +1,193 @@
+/* Grid to full preview.
+ *
+ * Two numbers here have a JS counterpart:
+ *   --gp-gap     the grid gap. CSS only -- nothing in JS reads it.
+ *   --gp-shrink  how much smaller than its 2x2 block of cells the pane ends up.
+ *                This is the JS option `shrinkVw`; both are written the same way
+ *                round so the pair stays easy to keep in step, and half of it
+ *                goes to each edge.
+ * --gp-arm is the width of the plus sign the iris starts from. Cosmetic.
+ * The 900px breakpoint below is duplicated in nothing: it is the only place
+ * that decides when the pane layer switches off.
+ */
+
+/* The geometry assumes border-box: the pane layer's `inset` plus its
+   `calc(100% - padding)` width only agree with it. A host page with a reset
+   (normalize, or this project's base.css) already supplies both of these; the
+   starter carries its own so it also stands up on a bare page. */
+.gp,
+.gp *,
+.gp *::before,
+.gp *::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+}
+
+.gp {
+  --gp-bg: #131319;
+  --gp-text: #fafafa;
+  --gp-gap: 5vw;
+  --gp-shrink: 5vw;
+  --gp-arm: 5vw;
+  --gp-page-padding: 1.5rem;
+  --gp-pane-padding: 48px;
+
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100svh;
+  padding: var(--gp-page-padding);
+  overflow: hidden;
+  background: var(--gp-bg);
+  color: var(--gp-text);
+  transition: opacity 500ms ease;
+}
+
+/* Until the pictures are decoded, a hover can open a pane that is still empty, so
+   the page starts covered and the module lifts it once preloadImages resolves. */
+body.gp-loading .gp {
+  opacity: 0;
+}
+
+/* The tile grid and the preview layer declare the SAME grid, the same padding and
+   the same gaps. That coincidence is the whole trick: it is what lets a pane land
+   on the cells it is meant to cover without anything being measured in JS. */
+.gp__grid,
+.gp__previews {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  grid-template-rows: repeat(2, 1fr);
+  row-gap: var(--gp-gap);
+  column-gap: var(--gp-gap);
+  width: 100%;
+  height: 100%;
+  padding: var(--gp-pane-padding);
+}
+
+.gp__grid {
+  position: relative;
+  margin: 0;
+  list-style: none;
+}
+
+.gp__previews {
+  position: absolute;
+  inset: var(--gp-page-padding);
+  width: calc(100% - var(--gp-page-padding) * 2);
+  height: calc(100% - var(--gp-page-padding) * 2);
+  /* Load bearing: without this the panes swallow the hover and no tile responds. */
+  pointer-events: none;
+  z-index: 2;
+}
+
+.gp__tile {
+  position: relative;
+  display: block;
+  width: 100%;
+  height: 100%;
+  /* Load bearing: scaling a pane must not reflow its neighbours mid move. */
+  contain: size;
+  cursor: pointer;
+}
+
+/* Every picture fills its box the same way, tile or pane. */
+.gp__tile > img,
+.gp-preview__images > img {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.gp-preview {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  /* Load bearing: a pane's size comes from the grid it is laid over, never from a
+     width or a height. Two columns, both rows -- a 2x2 quadrant of the 4x2 grid. */
+  grid-column: auto / span 2;
+  grid-row: 1 / span 2;
+  opacity: 0;
+}
+
+.gp-preview__images {
+  display: grid;
+  grid-template-columns: auto;
+  grid-template-rows: auto;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+/* Every detail image lands in the same cell, so the gallery is a cross fade and
+   never a layout change. */
+.gp-preview__images > img {
+  grid-column: 1;
+  grid-row: 1;
+  opacity: 0;
+}
+
+/* Sits on the seam under the picture. It rides the pane's transform, so it scales
+   with it; the reference accepts the same trade. */
+.gp-preview__caption {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  z-index: 3;
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  width: 100%;
+  font-size: 12px;
+  letter-spacing: 0.08em;
+}
+
+.gp-preview__caption p {
+  margin: 0;
+}
+
+.gp-preview__meta {
+  opacity: 0.7;
+  text-align: right;
+}
+
+/* The opaque cover the iris is cut out of. It paints above the pictures on
+   purpose: the plus shape is the part still covering them. */
+.gp-preview__inside {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  background: var(--gp-bg);
+}
+
+/* Below the breakpoint the pane layer switches off and the grid drops to two
+   columns, so a phone gets the pictures instead of a blank page. */
+@media (max-width: 899px) {
+  .gp {
+    height: auto;
+    min-height: 100svh;
+    align-items: stretch;
+    padding: 1rem;
+  }
+
+  .gp__grid {
+    grid-template-columns: repeat(2, 1fr);
+    grid-template-rows: none;
+    grid-auto-rows: minmax(32vh, 1fr);
+    row-gap: 3vw;
+    column-gap: 3vw;
+    height: auto;
+    padding: 0;
+  }
+
+  .gp__previews {
+    display: none;
+  }
+}
