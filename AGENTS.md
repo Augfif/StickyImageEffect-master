@@ -80,7 +80,19 @@ js/
     progress.js             # 底部进度条
 tools/depth/
   make-depth.mjs            # 素材管线：同步 / 缩放 / 生成深度图
+.codex/skills/
+  grid-to-preview-hover/    # 项目内技能：网格悬停放大预览，附可套用的 starter
+codrops-grid-to-preview/    # AI 互动页的参考工程（.gitignore，不入库）
 ```
+
+## 项目内技能
+
+`.codex/skills/grid-to-preview-hover/` 是「悬停网格中的一件时，对面半屏让位、该图放大填满」这套效果的
+可复用技能：`SKILL.md` 列必须保住的不变量，`references/mechanics.md` 讲机制、几何算法与十字 clip-path
+的原文值，`assets/grid-preview-starter/` 是纯 CSS + ESM、可直接拷进页面的三件套。
+
+它对应的参考工程是 `codrops-grid-to-preview/`（Codrops《Grid to Full Preview》，MIT），因为带 DALL·E
+生成的商品图，按仓库惯例只作本地参考、不随仓库分发。AI 互动页打算用这套效果。
 
 ## 数据流
 
