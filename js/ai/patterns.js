@@ -38,12 +38,12 @@ export const patterns = [
   { slug: "yizihua", title: "椅子花", meta: "椅织锦纹藏巧艺" },
   { slug: "liyuyuelongmen", title: "鲤鱼跃龙门", meta: "鲤跃锦图盼前程" },
   { slug: "yangqueniao", title: "阳雀鸟", meta: "阳雀成双载希望" },
-  // 下面三个取自《衣载千年》长图（文旅来凤，2026-10-06）。同一篇里还导出了
-  // 十二勾花、梭罗树、老鼠嫁女、粑粑架 四张，已在 images/ 里备用——换上来只要
-  // 把这里的 title 改成对应文件名即可。
-  { slug: "hudieximudan", title: "蝴蝶戏牡丹", meta: "蝶戏牡丹阖家欢" },
-  { slug: "shanxinghua", title: "山兴花", meta: "山形兴旺万物生" },
-  { slug: "wanzigechuanghua", title: "万字格窗花", meta: "万字窗格福常驻" }
+  // 下面三个用 tujia/ 里那批高清原图（1824–1920 宽），比从长图裁切的 778 宽
+  // 清楚得多。meta 先写画面描述；除了梭罗树纹可参照《衣载千年》的说法，另外两个
+  // 的寓意没有权威出处，别照猜，等拿到释文再换。
+  { slug: "sishibagou", title: "四十八勾", meta: "勾纹相扣绵延不断" },
+  { slug: "suoluoshuwen", title: "梭罗树纹", meta: "枝叶舒展步步高升" },
+  { slug: "chakouwen", title: "碴口纹", meta: "几何碴口规整有序" }
 ];
 
 export function patternBySlug(slug) {
