@@ -211,7 +211,7 @@ AI 网格的素材不走 `depth` 流程：直接把 `<纹样名>.jpg`（整体�
   （用户明确要求：每次改完代码都保存一下。）
 - 提交信息格式：`类型: 中文说明`，类型用 `feat` / `fix` / `style` / `refactor` / `chore` / `docs` / `perf`。
   一次提交只做一件事，说明写「改了什么、为什么」。
-- `origin` 曾经指向模板作者的上游仓库，已改名为 **`upstream`**（只读参考，不要 push 上去）。
-  自己的远程仓库确定后，再把新地址加为 `origin`。
+- 远端只有一个 **`origin`**：`https://github.com/Augfif/StickyImageEffect-master.git`。
+  它一度被临时改名为 `upstream` 当作只读模板，后来确认就是发布目标，推送走 `git push origin main`。
 - 提交前确认没有把临时文件、`node_modules`、以及上面提到的版权资料带进去。
 - 图像、字体、`.woff2` 等二进制素材已由 `.gitattributes` 标记为 binary，行尾不会被转换。
