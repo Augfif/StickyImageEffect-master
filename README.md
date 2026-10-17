@@ -4,12 +4,15 @@
 
 ```bash
 npm install
-npm run dev        # http://localhost:5173/ 是开场页，/main.html 是照片主界面，/ai.html 是 AI 活动页（占位）
+npm run dev        # / 开场页、/main.html 主界面、/ai.html 纹样网格、/ai-style.html 造型生成
 ```
 
-三个入口在同一个 dev server 上（见 `vite.config.js`）。开场页末尾并排两个按钮，分别进主界面和 AI 页；
+四个入口在同一个 dev server 上（见 `vite.config.js`）。开场页末尾并排两个按钮，分别进主界面和 AI 页；
 右上角「跳过」平滑滚到这一屏，AI 页的「返回」用 `index.html?at=end` 回到同一屏。
 开场页的内容全在 `js/intro/beats.js`：
+
+AI 网格的八幅纹样与图片文件名约定见 `js/ai/patterns.js`；造型生成页需要 `ai-drawing` 后端
+在 8000 端口运行，`npm run dev` 与 `npm run preview` 会通过 `/api` 代理过去。
 十条目 `{ image, title, meta }`，`image: null` 的那几条就是还没补图的深色空框。只想调主界面的话
 直接开 `/main.html`。
 

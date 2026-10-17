@@ -23,43 +23,64 @@
 
 ```bash
 npm install          # 首次
-npm run dev          # http://localhost:5173/ 是开场页，/main.html 是照片主界面
+npm run dev          # / 开场页、/main.html 主界面、/ai.html 纹样网格、/ai-style.html 造型生成
 npm run build        # 产物在 dist/
 npm run preview      # 预览 dist/
 npm run depth:setup  # 装 tools/depth 自己的依赖（sharp + transformers）
 npm run depth        # 同步 tujia/ → 缩放 → 生成深度图；--force 全量重算
 ```
 
-三个入口共用同一个 dev server，配置在 [vite.config.js](vite.config.js)。
+四个入口共用同一个 dev server，配置在 [vite.config.js](vite.config.js)。
 
-## 架构：三个页面，两条渲染管线
+## 架构：四个页面
 
 | 入口 | HTML | JS 入口 | 说明 |
 | --- | --- | --- | --- |
 | 开场页 | [index.html](index.html) | `js/intro/index.js` | 电影感「走廊」自动播放 + 滚动推进十条内容 |
 | 主界面 | [main.html](main.html) | `js/index.js` | 可拖动切换的 sticky 视差幻灯片（五张照片） |
-| AI 页 | [ai.html](ai.html) | `js/ai/index.js` | 目前只是空壳：暗色空间 + 「即将上线」，活动本身尚未实现 |
+| AI 网格 | [ai.html](ai.html) | `js/ai/index.js` | 4×2 八幅纹样，悬停时对面半屏放大并轮播该纹样的多角度图，点击进入生成页 |
+| 造型生成 | [ai-style.html](ai-style.html) | `js/ai/style.js` | 上传人物与布料 → 调 ai-drawing 生成 → 展示与下载结果 |
 | — | [base.html](base.html) | — | 原始 Codrops 模板页，**不在 build 入口里，当前不可运行**，仅作历史参考 |
 
 导航只从开场页末尾发出去：那里并排两个按钮（「赏织锦」→ `main.html`，「AI 互动」→ `ai.html`），
 右上角「跳过」平滑滚到这一屏而不是跳页面。AI 页的「返回」用 `index.html?at=end` 回到同一屏，
 该参数会跳过开场推镜直接落位。改这两个去向看 `js/intro/index.js` 的 `ROUTES`。
 
+AI 网格的每格是一个 `<a href="ai-style.html?pattern=<slug>">`，所以窄屏没有悬停预览时也能点进去。
+
 `base.html` 用普通 `<script src="js/index.js">` 引入，而现代码是 ES module，
 所以它跑不起来；保留它只是为了对照上游模板。
+
+## AI 互动与造型生成
+
+**内容只改 `js/ai/patterns.js`**：八个纹样按 `slug / title / meta` 排好，图片按文件名自动发现。
+`images/岩墙花.jpg` 是格子图与面板首帧，`images/岩墙花-2.jpg`、`-3.jpg` 是同一纹样的其余角度，
+悬停时在面板里交叉淡入；不放进图也不会让构建失败，只是不轮播。待补纹样标 `pending: true`，
+渲染成不可交互的占位格。`js/ai/copy.js` 收着两个 AI 页面的全部文案。
+
+**后端契约**（`ai-drawing/`，独立工程）：`POST /api/v1/styled-look`，`multipart/form-data`，
+三个必填字段 `person_and_fabric`、`accessory`、`chair`，成功直接返回图片二进制，
+失败返回 `{ error: { code, message } }`（400/413/415/422/500/502）。**接口不收纹样、也不收提示词**，
+所以选中的织锦只做页面语境，布料只能来自用户上传的那张人像。配饰与椅子用
+`images/ai/accessory.png`、`images/ai/chair.png`（从后端 `images/` 复制，前端自包含）。
+
+开发与 `npm run preview` 都靠 `vite.config.js` 里的 `/api` → `127.0.0.1:8000` 代理，
+所以本地不需要后端开 CORS。**静态部署后没有代理**：要么把前后端放在同一来源，
+要么给后端加 `Access-Control-Allow-Origin`，并把 `VITE_AI_API_BASE` 指到后端地址。
 
 ### 目录地图
 
 ```
 index.html main.html        # 幻灯片与开场页
-ai.html                     # AI 活动页（占位）
+ai.html ai-style.html       # AI 网格与造型生成
 base.html                   # 遗留模板页，不构建
 css/
   base.css                  # reset + 配色变量 + 自定义光标 + 加载动画
   intro.css                 # 只属于开场页
   styles.css                # 只属于主界面（含 @font-face 与响应式断点）
 fonts/                      # MaShanZheng 毛笔字体（自托管）
-images/                     # 页面真正引用的素材：原图 + 同名 -depth.png
+images/                     # 页面真正引用的素材：原图 + 同名 -depth.png + 纹样多角度 -2/-3.jpg
+images/ai/                  # 生成请求用的默认配饰与椅子
 tujia/                      # 原图投放目录，depth 工具从这里同步到 images/
 js/
   index.js                  # 主界面组装入口
@@ -78,6 +99,12 @@ js/
     text.js                 # 文案层：SplitText + ScrollTrigger 时间线
     beats.js                # ★ 开场页唯一需要改内容的文件
     progress.js             # 底部进度条
+  ai/
+    index.js                # 网格页组装：按 patterns 建格子与链接
+    patterns.js             # ★ 八个纹样与图片自动发现，改内容改这里
+    grid-preview.js         # 悬停放大预览组件（技能 starter 原样搬入）
+    style.js                # 生成页：上传、提交、等待、结果三态
+    copy.js                 # 两个 AI 页面的全部文案
 tools/depth/
   make-depth.mjs            # 素材管线：同步 / 缩放 / 生成深度图
 .codex/skills/
@@ -145,6 +172,10 @@ codrops-grid-to-preview/    # AI 互动页的参考工程（.gitignore，不入�
 3. 往 `slidesData` 加一条，并按需给 `focus` / `focusMobile`。
 
 开场页同理，改 `js/intro/beats.js`。
+
+AI 网格的素材不走 `depth` 流程：直接把 `<纹样名>.jpg`（整体）、`<纹样名>-2.jpg`（纹样特写）、
+`<纹样名>-3.jpg`（材质细节）放进 `images/`，`js/ai/patterns.js` 会自动认到。建议 3:4 竖版、
+长边 ≥1200、单张 ≤1.5 MB；横图也能用（`object-fit: cover`），但同一个面板里混排会裁切得不一致。
 
 > `images/1.jpg` ~ `5.jpg` 及配套深度图是上游模板留下的素材，当前代码没有引用。
 
