@@ -1,10 +1,15 @@
 // The slideshow gesture owns the whole window, so anything that wants its own
-// pointer handling has to be carved out: the "Read more" button and the copy
-// sheet both do. They are skipped before the touch listener's preventDefault()
-// so a tap still turns into a normal click on phones.
+// pointer handling has to be carved out: the "Read more" button, the copy sheet
+// and the back link all do. They are skipped before the touch listener's
+// preventDefault(), so a tap still turns into a normal click on phones -- and a
+// mouse click on them never starts a drag that would flash the zoom-out.
 function isOwnPointerTarget(target) {
   if (!target || typeof target.closest !== "function") return false;
-  return !!(target.closest(".slide-more") || target.closest(".sheet"));
+  return !!(
+    target.closest(".slide-more") ||
+    target.closest(".sheet") ||
+    target.closest(".slide-back")
+  );
 }
 
 class Grab {
