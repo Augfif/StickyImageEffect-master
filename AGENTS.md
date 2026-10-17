@@ -39,7 +39,7 @@ npm run depth        # 同步 tujia/ → 缩放 → 生成深度图；--force �
 | 开场页 | [index.html](index.html) | `js/intro/index.js` | 电影感「走廊」自动播放 + 滚动推进十条内容 |
 | 主界面 | [main.html](main.html) | `js/index.js` | 可拖动切换的 sticky 视差幻灯片（五张照片） |
 | AI 网格 | [ai.html](ai.html) | `js/ai/index.js` | 4×2 八幅纹样，悬停时对面半屏放大并轮播该纹样的多角度图，点击进入生成页 |
-| 造型生成 | [ai-style.html](ai-style.html) | `js/ai/style.js` | 上传人物与布料 → 调 ai-drawing 生成 → 展示与下载结果 |
+| 造型生成 | [ai-style.html](ai-style.html) | `js/ai/style.js` | 上传人物照片 → 调 ai-drawing 生成 → 展示与下载结果 |
 | — | [base.html](base.html) | — | 原始 Codrops 模板页，**不在 build 入口里，当前不可运行**，仅作历史参考 |
 
 导航只从开场页末尾发出去：那里并排两个按钮（「赏织锦」→ `main.html`，「AI 互动」→ `ai.html`），
@@ -59,10 +59,12 @@ AI 网格的每格是一个 `<a href="ai-style.html?pattern=<slug>">`，所以�
 渲染成不可交互的占位格。`js/ai/copy.js` 收着两个 AI 页面的全部文案。
 
 **后端契约**（`ai-drawing/`，独立工程）：`POST /api/v1/styled-look`，`multipart/form-data`，
-三个必填字段 `person_and_fabric`、`accessory`、`chair`，成功直接返回图片二进制，
-失败返回 `{ error: { code, message } }`（400/413/415/422/500/502）。**接口不收纹样、也不收提示词**，
-所以选中的织锦只做页面语境，布料只能来自用户上传的那张人像。配饰与椅子用
+四个必填字段 `person`（人物）、`fabric`（布匹，唯一换料原料）、`accessory`、`chair`，
+成功直接返回图片二进制，失败返回 `{ error: { code, message } }`（400/413/415/422/500/502）。
+接口不收提示词，也不收「纹样 id」——选中的织锦是以 `fabric` 这个文件身份参与生成的。
+前端把用户上传的人像作为 `person`，把所选纹样的主图作为 `fabric`，配饰与椅子用
 `images/ai/accessory.png`、`images/ai/chair.png`（从后端 `images/` 复制，前端自包含）。
+字段顺序必须与提示词里的「参考图1/2/3/4」一一对应，传反了语义就反了。
 
 开发与 `npm run preview` 都靠 `vite.config.js` 里的 `/api` → `127.0.0.1:8000` 代理，
 所以本地不需要后端开 CORS。**静态部署后没有代理**：要么把前后端放在同一来源，

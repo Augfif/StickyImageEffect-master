@@ -230,25 +230,33 @@ ui.drop.addEventListener("drop", event => {
 window.addEventListener("dragover", event => event.preventDefault());
 window.addEventListener("drop", event => event.preventDefault());
 
-// --- the default accessory and chair ---------------------------------------
+// --- the three pictures the browser supplies -------------------------------
 
-let defaultsPromise = null;
+async function fetchBlob(url) {
+  const response = await fetch(url);
+  if (!response.ok) throw new Error(`asset ${response.status}: ${url}`);
+  return response.blob();
+}
 
-function loadDefaults() {
-  if (!defaultsPromise) {
-    defaultsPromise = Promise.all(
-      [accessoryUrl, chairUrl].map(url =>
-        fetch(url).then(response => {
-          if (!response.ok) throw new Error(`default asset ${response.status}`);
-          return response.blob();
-        })
-      )
-    ).catch(error => {
-      defaultsPromise = null;
-      throw error;
-    });
+// The backend takes four references: 人物、布匹、配饰、椅子. The fabric is the
+// selected pattern's main shot and the other two are bundled defaults, so only
+// the person comes from the visitor.
+let presetsPromise = null;
+
+function loadPresets() {
+  if (!presetsPromise) {
+    presetsPromise = Promise.all([
+      fetchBlob(shots[0]),
+      fetchBlob(accessoryUrl),
+      fetchBlob(chairUrl)
+    ])
+      .then(([fabric, accessory, chair]) => ({ fabric, accessory, chair }))
+      .catch(error => {
+        presetsPromise = null;
+        throw error;
+      });
   }
-  return defaultsPromise;
+  return presetsPromise;
 }
 
 // --- generating ------------------------------------------------------------
@@ -321,11 +329,12 @@ async function generate() {
   state.controller = controller;
 
   try {
-    const [accessory, chair] = await loadDefaults();
+    const presets = await loadPresets();
     const body = new FormData();
-    body.append("person_and_fabric", state.file, state.file.name);
-    body.append("accessory", accessory, "accessory.png");
-    body.append("chair", chair, "chair.png");
+    body.append("person", state.file, state.file.name);
+    body.append("fabric", presets.fabric, `${pattern.title}.jpg`);
+    body.append("accessory", presets.accessory, "accessory.png");
+    body.append("chair", presets.chair, "chair.png");
 
     const response = await fetch(ENDPOINT, {
       method: "POST",
