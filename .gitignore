@@ -24,3 +24,11 @@ _*
 README copy.md
 .dev-server.out.log
 .dev-server.err.log
+
+# 密钥：根目录这份 .env 里是真实 ARK Key，绝不能被 git add 捡进去
+.env
+.env.*
+!.env.example
+
+# AI 生成后端：独立工程，自带 .gitignore，不并入前端仓库
+ai-drawing/
