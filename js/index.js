@@ -13,6 +13,16 @@ import liyu from "../images/鲤鱼跃龙门.jpg";
 import liyuDepth from "../images/鲤鱼跃龙门-depth.png";
 import yangqueniao from "../images/阳雀鸟.jpg";
 import yangqueniaoDepth from "../images/阳雀鸟-depth.png";
+import sishibagou from "../images/四十八勾.jpg";
+import sishibagouDepth from "../images/四十八勾-depth.png";
+import shanxinghua from "../images/山兴花.jpg";
+import shanxinghuaDepth from "../images/山兴花-depth.png";
+import babajia from "../images/粑粑架.jpg";
+import babajiaDepth from "../images/粑粑架-depth.png";
+import wanzigechuanghua from "../images/万字格窗花.jpg";
+import wanzigechuanghuaDepth from "../images/万字格窗花-depth.png";
+import laoshujianv from "../images/老鼠嫁女.jpg";
+import laoshujianvDepth from "../images/老鼠嫁女-depth.png";
 
 const container = document.getElementById("app");
 // #app clips the canvas with overflow: hidden, which still makes it a scroll
@@ -84,6 +94,60 @@ const slidesData = [
     meta: "阳雀成双载希望",
     detail:
       "<p>土家的代表性动物纹样。传说阳雀一叫，春耕就开始了，所以它常以成对的姿态出现。</p><p>成双的阳雀象征新生与希望，也寄托着对来年收成的期盼。</p>"
+  },
+  {
+    image: sishibagou,
+    depth: sishibagouDepth,
+    // 横图，与鲤鱼跃龙门同一套处理：缩成右侧卡片，左边留暗底给标题。
+    focus: { x: 0.3, y: 0.5, zoom: 0.68 },
+    focusMobile: { x: 0.5, y: 0.5, zoom: 1 },
+    title: "四十八勾",
+    meta: "四十八勾巧相扣",
+    detail:
+      "<p>勾纹是西兰卡普最常见的骨架：一个勾套一个勾，折线反复折返，连成整片。名字里的「四十八」说的就是这种层叠的数量。</p><p>红白相间的方格最考验收边——每一道勾都要对得上，否则整幅布的节奏就乱了。</p>"
+  },
+  {
+    image: shanxinghua,
+    depth: shanxinghuaDepth,
+    focus: { x: 0.3, y: 0.5, zoom: 0.68 },
+    focusMobile: { x: 0.5, y: 0.5, zoom: 1 },
+    title: "山兴花",
+    meta: "山形兴旺万物生",
+    detail:
+      "<p>以抽象山形入纹，源自土家织女对家乡山水的遐想：起伏的折线是山脊，层叠的色块是坡地。</p><p>它寄托的是山林兴旺、万物生生不息的愿望，也是西兰卡普里少见的「风景」题材。</p>"
+  },
+  {
+    image: babajia,
+    depth: babajiaDepth,
+    focus: { x: 0.3, y: 0.5, zoom: 0.68 },
+    focusMobile: { x: 0.5, y: 0.5, zoom: 1 },
+    title: "粑粑架",
+    meta: "五谷丰登仓廪盈",
+    detail:
+      "<p>取材于土家山寨蒸烤年粑的木架，把支架、横梁与摆放的器物提炼成规整的几何纹路。</p><p>这是典型的农耕纹样，寓意五谷丰登、仓廪充盈；早年的粑粑架多用蚕丝织造，在西兰卡普里算是贵重的一类。</p>"
+  },
+  {
+    image: wanzigechuanghua,
+    depth: wanzigechuanghuaDepth,
+    // 竖图，织锦抱在人物右侧；比标准的 0.30 往右挪一点保留花纹，但别挪多——
+    // 过了 0.4 照片会整个左移，标题就压在花纹上了。
+    focus: { x: 0.35, y: 0.55, zoom: 1.6 },
+    focusMobile: { x: 0.5, y: 0.55, zoom: 1.5 },
+    title: "万字格窗花",
+    meta: "万字窗格福常驻",
+    detail:
+      "<p>万字格是西兰卡普里最规整的骨架之一，配上刺梨花纹之后连续延展，一格接一格地铺满整幅。</p><p>造型方正吉祥，寓意家宅稳固、阖家团圆、福气常驻。</p>"
+  },
+  {
+    image: laoshujianv,
+    depth: laoshujianvDepth,
+    // 竖图，人物手里的长幡偏左，聚焦点略向左。
+    focus: { x: 0.38, y: 0.55, zoom: 1.6 },
+    focusMobile: { x: 0.46, y: 0.55, zoom: 1.5 },
+    title: "老鼠嫁女",
+    meta: "鼠嫁喜临婚姻美",
+    detail:
+      "<p>西兰卡普里少见的叙事型纹样：抬轿、迎亲、过门被完整织进一条长幡，人物和器物都要靠极简的线条交代清楚。</p><p>它讲的是民间「老鼠嫁女」的喜事，寓意喜事临门、婚姻美满。</p>"
   }
 ];
 
