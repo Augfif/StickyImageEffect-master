@@ -1,31 +1,21 @@
-/* The AI page's shell. It loads base.css, never intro.css: every rule in there
-   is about a scrolling film this page does not have. */
-
-/* Self hosted here rather than inherited from css/styles.css: the opener never
-   loads that file, so it draws its brush titles with whatever calligraphy face
-   the machine happens to have, while this page should look the same on the
-   judging laptop as it does here. Declaring it here leaves the opener alone. */
-@font-face {
-  font-family: "Ma Shan Zheng";
-  font-style: normal;
-  font-weight: 400;
-  font-display: swap;
-  src: url("../fonts/MaShanZheng-Regular.woff2") format("woff2");
-}
+/* The AI activity grid.
+ *
+ * The .gp block is the grid-to-preview-hover component; the original lives in
+ * .codex/skills/grid-to-preview-hover/assets/grid-preview-starter/ and
+ * references/mechanics.md explains why these particular values are what they
+ * are. Everything above it is this page's own chrome.
+ */
 
 html,
 body {
   height: 100%;
 }
 
-/* The same room as the opener, so stepping through the door reads as walking
-   into the next space rather than leaving the building. */
 .ai {
   margin: 0;
-  background:
-    radial-gradient(circle at 50% 42%, #22222b 0, #17171e 46%, #0d0d11 100%);
+  background: #131319;
   color: #fff;
-  overflow: hidden;
+  overflow-x: hidden;
 }
 
 /* Sits where the opener's skip button sits, and looks like it. */
@@ -33,7 +23,7 @@ body {
   position: fixed;
   top: 5vh;
   right: 5vw;
-  z-index: 2;
+  z-index: 4;
   padding: 0.45rem 0.9rem;
   font-size: 0.72rem;
   letter-spacing: 0.28em;
@@ -47,42 +37,209 @@ body {
   color: rgba(255, 255, 255, 0.9);
 }
 
-.ai__stage {
-  position: fixed;
-  inset: 0;
+/* ------------------------------------------------------------- the grid -- */
+
+/* The geometry assumes border-box: the pane layer's `inset` plus its
+   `calc(100% - padding)` width only agree with it. base.css already sets it. */
+.gp,
+.gp *,
+.gp *::before,
+.gp *::after {
+  box-sizing: border-box;
+}
+
+.gp {
+  --gp-bg: #131319;
+  --gp-text: #fafafa;
+  --gp-gap: 5vw;
+  --gp-shrink: 5vw;
+  --gp-arm: 5vw;
+  --gp-page-padding: 1.5rem;
+  --gp-pane-padding: 48px;
+
+  position: relative;
   display: flex;
-  flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 1.1rem;
-  padding: 0 8vw;
-  text-align: center;
+  width: 100%;
+  height: 100svh;
+  padding: var(--gp-page-padding);
+  overflow: hidden;
+  background: var(--gp-bg);
+  color: var(--gp-text);
+  transition: opacity 500ms ease;
 }
 
-.ai__title {
+/* Until the pictures are decoded a hover can open a pane that is still empty, so
+   the grid starts hidden and js/ai/index.js lifts it once preloading resolves. */
+body.gp-loading .gp {
+  opacity: 0;
+}
+
+/* The tile grid and the preview layer declare the SAME grid, padding and gaps.
+   That coincidence is the whole trick: it is what lets a pane land on the cells
+   it is meant to cover without anything being measured in JS. */
+.gp__grid,
+.gp__previews {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  grid-template-rows: repeat(2, 1fr);
+  row-gap: var(--gp-gap);
+  column-gap: var(--gp-gap);
+  width: 100%;
+  height: 100%;
+  padding: var(--gp-pane-padding);
+}
+
+.gp__grid {
+  position: relative;
   margin: 0;
-  font-family: "Ma Shan Zheng", "华文行楷", "STXingkai", "方正舒体", "FZShuTi",
-    "楷体", "KaiTi", "STKaiti", serif;
-  font-weight: 400;
-  font-size: clamp(3rem, 9vw, 8rem);
-  line-height: 1.05;
-  letter-spacing: 0.02em;
-  color: #fafafa;
-  text-shadow: 0 2px 30px rgba(0, 0, 0, 0.85);
+  list-style: none;
 }
 
-.ai__meta {
+.gp__previews {
+  position: absolute;
+  inset: var(--gp-page-padding);
+  width: calc(100% - var(--gp-page-padding) * 2);
+  height: calc(100% - var(--gp-page-padding) * 2);
+  /* Load bearing: without this the panes swallow the hover and no tile responds. */
+  pointer-events: none;
+  z-index: 2;
+}
+
+.gp__tile {
+  position: relative;
+  display: block;
+  width: 100%;
+  height: 100%;
+  /* Load bearing: scaling a pane must not reflow its neighbours mid move. */
+  contain: size;
+}
+
+.gp__tile-link {
+  display: block;
+  width: 100%;
+  height: 100%;
+  cursor: pointer;
+}
+
+/* The tile picture and the pane's pictures fill their box the same way. */
+.gp__tile img,
+.gp-preview__images > img {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Extra angles exist only to feed the pane's cross fade; they never show here. */
+.gp__tile img[data-detail] {
+  display: none;
+}
+
+/* A pattern whose pictures have not arrived yet: it keeps the 2x2 block intact
+   but cannot be hovered or entered. */
+.gp__tile--pending {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: rgba(255, 255, 255, 0.32);
+  font-size: 0.72rem;
+  letter-spacing: 0.3em;
+  text-indent: 0.3em;
+  pointer-events: none;
+}
+
+.gp-preview {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  /* Load bearing: a pane's size comes from the grid it is laid over, never from a
+     width or a height. Two columns, both rows -- a 2x2 quadrant of the 4x2 grid. */
+  grid-column: auto / span 2;
+  grid-row: 1 / span 2;
+  opacity: 0;
+}
+
+.gp-preview__images {
+  display: grid;
+  grid-template-columns: auto;
+  grid-template-rows: auto;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+/* Every angle lands in the same cell, so the gallery is a cross fade and never a
+   layout change. */
+.gp-preview__images > img {
+  grid-column: 1;
+  grid-row: 1;
+  opacity: 0;
+}
+
+/* Sits on the seam under the picture and rides the pane's transform. */
+.gp-preview__caption {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  z-index: 3;
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  width: 100%;
+  font-size: 12px;
+  letter-spacing: 0.08em;
+}
+
+.gp-preview__caption p {
   margin: 0;
-  font-size: clamp(0.85rem, 1.5vw, 1.1rem);
-  letter-spacing: 0.4em;
-  text-indent: 0.4em;
-  color: rgba(255, 255, 255, 0.72);
-  text-shadow: 0 1px 18px rgba(0, 0, 0, 0.8);
 }
 
-@media (max-width: 53em) {
+.gp-preview__meta {
+  opacity: 0.7;
+  text-align: right;
+}
+
+/* The opaque cover the iris is cut out of. It paints above the pictures on
+   purpose: the plus shape is the part still covering them. */
+.gp-preview__inside {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  background: var(--gp-bg);
+}
+
+/* Below the breakpoint the pane layer switches off and the grid drops to two
+   columns, so a phone gets the pictures instead of a blank page. Entering a
+   pattern then works the same way, by tapping the tile. */
+@media (max-width: 899px) {
+  .gp {
+    height: auto;
+    min-height: 100svh;
+    align-items: stretch;
+    padding: 1rem;
+  }
+
+  .gp__grid {
+    grid-template-columns: repeat(2, 1fr);
+    grid-template-rows: none;
+    grid-auto-rows: minmax(32vh, 1fr);
+    row-gap: 3vw;
+    column-gap: 3vw;
+    height: auto;
+    padding: 0;
+  }
+
+  .gp__previews {
+    display: none;
+  }
+
   .ai__back {
-    top: 3.5vh;
-    right: 6vw;
+    top: 1.4rem;
+    right: 1.2rem;
+    color: rgba(255, 255, 255, 0.7);
   }
 }

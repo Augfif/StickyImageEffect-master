@@ -5,7 +5,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <title>AI 互动 | 土家织锦</title>
-  <meta name="description" content="土家织锦的 AI 互动环节，敬请期待。" />
+  <meta name="description" content="悬停一幅织锦，看它的各个角度；点进去，用 AI 把它换到你自己的造型上。" />
   <link rel="shortcut icon" href="favicon.ico" />
   <!-- base.css brings the shared reset, the hidden native cursor and the
        self drawn ring; ai.css only owns this page. -->
@@ -16,15 +16,15 @@
   </script>
 </head>
 
-<body class="ai">
+<body class="ai gp-loading">
   <!-- Back to the opener's two doors, not to the top of the film: that is the
        screen the reader came from. -->
-  <a class="ai__back" href="index.html?at=end">返回</a>
+  <a class="ai__back" id="ai-back" href="index.html?at=end">返回</a>
 
-  <main class="ai__stage">
-    <h1 class="ai__title">AI 互动</h1>
-    <p class="ai__meta">即将上线</p>
-  </main>
+  <!-- The eight tiles are built from js/ai/patterns.js, so the pattern list,
+       the picture file names and the links have one home. createGridPreview()
+       then builds both preview panes out of those tiles. -->
+  <div class="gp" id="grid"></div>
 
   <div class="cursor">
     <div class="cursor__inner cursor__inner--circle"></div>
