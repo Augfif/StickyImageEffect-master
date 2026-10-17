@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="zh-CN" class="no-js">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>造型生成 | 土家织锦</title>
+  <meta name="description" content="用你手里的土家织锦，给人物、配饰和椅子统一换料。" />
+  <link rel="shortcut icon" href="favicon.ico" />
+  <link rel="stylesheet" type="text/css" href="css/base.css" />
+  <link rel="stylesheet" type="text/css" href="css/ai-style.css" />
+  <script>
+    document.documentElement.className = "js";
+  </script>
+</head>
+
+<body class="studio">
+  <a class="studio__back" href="ai.html" id="back-link">返回网格</a>
+
+  <!-- No pattern in the url, or one that has no pictures yet. -->
+  <section class="studio__state studio__state--center" id="state-invalid" hidden>
+    <h1 class="studio__empty-title" id="invalid-title"></h1>
+    <p class="studio__empty-body" id="invalid-body"></p>
+    <a class="studio__cta" href="ai.html" id="invalid-action"></a>
+  </section>
+
+  <!-- 1. the form -->
+  <section class="studio__state studio__state--form" id="state-form" hidden>
+    <aside class="studio__pattern">
+      <img class="studio__pattern-shot" id="pattern-shot" alt="" />
+      <p class="studio__eyebrow" id="pattern-eyebrow"></p>
+      <h1 class="studio__title" id="pattern-title"></h1>
+      <p class="studio__meta" id="pattern-meta"></p>
+    </aside>
+
+    <div class="studio__panel">
+      <div class="studio__copy" id="pattern-copy"></div>
+
+      <label class="studio__drop" id="drop">
+        <input class="studio__file" id="person-input" type="file" accept="image/*" />
+        <span class="studio__drop-inner" id="drop-inner">
+          <strong class="studio__drop-title" id="upload-title"></strong>
+          <span class="studio__drop-hint" id="upload-hint"></span>
+        </span>
+        <img class="studio__preview" id="preview" alt="" hidden />
+      </label>
+
+      <div class="studio__defaults">
+        <p class="studio__defaults-title" id="defaults-title"></p>
+        <figure class="studio__default">
+          <img id="accessory-shot" alt="" />
+          <figcaption>
+            <span id="accessory-label"></span> · <span id="default-note"></span>
+          </figcaption>
+        </figure>
+        <figure class="studio__default">
+          <img id="chair-shot" alt="" />
+          <figcaption>
+            <span id="chair-label"></span> · <span id="default-note-2"></span>
+          </figcaption>
+        </figure>
+      </div>
+
+      <p class="studio__error" id="error" role="alert"></p>
+      <button class="studio__primary" id="submit" type="button" disabled></button>
+    </div>
+  </section>
+
+  <!-- 2. waiting: the backend allows 300s, so say so and let people leave. -->
+  <section class="studio__state studio__state--center" id="state-waiting" hidden aria-live="polite">
+    <p class="studio__waiting-title" id="waiting-title"></p>
+    <p class="studio__waiting-stage" id="waiting-stage"></p>
+    <p class="studio__waiting-time" id="waiting-time">00:00</p>
+    <p class="studio__waiting-hint" id="waiting-hint"></p>
+    <button class="studio__ghost" id="cancel" type="button"></button>
+  </section>
+
+  <!-- 3. the result -->
+  <section class="studio__state studio__state--center" id="state-result" hidden aria-live="polite">
+    <p class="studio__waiting-title" id="result-title"></p>
+    <img class="studio__result-image" id="result-image" alt="" />
+    <p class="studio__waiting-hint" id="result-hint"></p>
+    <div class="studio__actions">
+      <a class="studio__primary" id="download" download>下载</a>
+      <button class="studio__ghost" id="retry" type="button"></button>
+    </div>
+  </section>
+
+  <div class="cursor">
+    <div class="cursor__inner cursor__inner--circle"></div>
+  </div>
+
+  <script type="module" src="/js/ai/style.js"></script>
+</body>
+
+</html>

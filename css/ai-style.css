@@ -1,0 +1,384 @@
+/* The styled-look generator. Same room as the opener and the grid: the radial
+   gradient keeps the three pages reading as one place. */
+
+/* Self hosted here for the same reason ai.css never was: the opener does not
+   load styles.css, so it leans on a system calligraphy face, while this page
+   should look identical on the judging laptop. */
+@font-face {
+  font-family: "Ma Shan Zheng";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("../fonts/MaShanZheng-Regular.woff2") format("woff2");
+}
+
+html,
+body {
+  min-height: 100%;
+}
+
+.studio {
+  margin: 0;
+  min-height: 100svh;
+  background:
+    radial-gradient(circle at 50% 26%, #22222b 0, #17171e 46%, #0d0d11 100%);
+  color: #fff;
+  overflow-x: hidden;
+}
+
+.studio__back {
+  position: fixed;
+  top: 5vh;
+  right: 5vw;
+  z-index: 4;
+  padding: 0.45rem 0.9rem;
+  font-size: 0.72rem;
+  letter-spacing: 0.28em;
+  text-indent: 0.28em;
+  color: rgba(255, 255, 255, 0.42);
+  transition: color 300ms cubic-bezier(0.2, 1, 0.3, 1);
+}
+
+.studio__back:hover,
+.studio__back:focus-visible {
+  color: rgba(255, 255, 255, 0.9);
+}
+
+/* `hidden` has to keep winning over the display rules below, or a state that is
+   meant to be off would still lay out. */
+.studio__state[hidden] {
+  display: none;
+}
+
+.studio__state--form {
+  display: grid;
+  grid-template-columns: minmax(280px, 0.85fr) minmax(360px, 1.15fr);
+  gap: clamp(2rem, 5vw, 5rem);
+  align-items: start;
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: 8vh 6vw 8vh;
+}
+
+.studio__state--center {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1.1rem;
+  min-height: 100svh;
+  padding: 12vh 6vw;
+  text-align: center;
+}
+
+/* ------------------------------------------------------------- the pattern */
+
+.studio__pattern-shot {
+  width: 100%;
+  max-width: 340px;
+  aspect-ratio: 3 / 4;
+  object-fit: cover;
+  border-radius: 12px;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.55);
+}
+
+.studio__eyebrow {
+  margin: 1.4rem 0 0.4rem;
+  font-size: 0.7rem;
+  letter-spacing: 0.32em;
+  text-indent: 0.32em;
+  color: rgba(255, 255, 255, 0.45);
+}
+
+.studio__title {
+  margin: 0;
+  font-family: "Ma Shan Zheng", "华文行楷", "STXingkai", "方正舒体", "FZShuTi",
+    "楷体", "KaiTi", "STKaiti", serif;
+  font-weight: 400;
+  font-size: clamp(2.4rem, 5vw, 4rem);
+  line-height: 1.1;
+  letter-spacing: 0.02em;
+}
+
+.studio__meta {
+  margin: 0.5rem 0 0;
+  font-size: 0.9rem;
+  letter-spacing: 0.18em;
+  color: rgba(255, 255, 255, 0.62);
+}
+
+/* ---------------------------------------------------------------- the form */
+
+.studio__panel {
+  display: flex;
+  flex-direction: column;
+  gap: 1.4rem;
+  min-width: 0;
+}
+
+.studio__copy p {
+  margin: 0 0 0.9rem;
+  font-size: 0.95rem;
+  line-height: 1.8;
+  color: rgba(255, 255, 255, 0.72);
+}
+
+.studio__drop {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  min-height: 210px;
+  padding: 1.6rem;
+  border: 1px dashed rgba(255, 255, 255, 0.26);
+  border-radius: 14px;
+  text-align: center;
+  cursor: pointer;
+  transition: border-color 200ms ease, background 200ms ease;
+}
+
+.studio__drop:hover,
+.studio__drop.is-dragging {
+  border-color: rgba(255, 255, 255, 0.6);
+  background: rgba(255, 255, 255, 0.04);
+}
+
+/* Visible to assistive tech, out of the way of the label's click. */
+.studio__file {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.studio__drop-title {
+  font-size: 1rem;
+  letter-spacing: 0.12em;
+}
+
+.studio__drop-inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.studio__drop-hint {
+  max-width: 26em;
+  font-size: 0.82rem;
+  line-height: 1.7;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.studio__preview {
+  max-width: 100%;
+  max-height: 320px;
+  border-radius: 10px;
+  object-fit: contain;
+}
+
+/* Once a picture is chosen the prompt steps aside so the preview has the room. */
+.studio__drop.has-file .studio__drop-inner {
+  display: none;
+}
+
+.studio__defaults {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.9rem;
+}
+
+.studio__defaults-title {
+  width: 100%;
+  margin: 0;
+  font-size: 0.7rem;
+  letter-spacing: 0.3em;
+  color: rgba(255, 255, 255, 0.42);
+}
+
+.studio__default {
+  margin: 0;
+  width: 116px;
+}
+
+.studio__default img {
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+  border-radius: 8px;
+  opacity: 0.72;
+}
+
+.studio__default figcaption {
+  margin-top: 0.4rem;
+  font-size: 0.68rem;
+  letter-spacing: 0.08em;
+  color: rgba(255, 255, 255, 0.45);
+}
+
+.studio__error {
+  margin: 0;
+  min-height: 1.2em;
+  font-size: 0.85rem;
+  color: #ffb4a8;
+}
+
+.studio__primary,
+.studio__ghost,
+.studio__cta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  align-self: flex-start;
+  padding: 0.95rem 2.2rem;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  border-radius: 999px;
+  background: none;
+  color: #fff;
+  font-size: 0.9rem;
+  letter-spacing: 0.22em;
+  text-indent: 0.22em;
+  transition: background 200ms ease, border-color 200ms ease, opacity 200ms ease;
+}
+
+.studio__primary:hover,
+.studio__primary:focus-visible,
+.studio__cta:hover,
+.studio__cta:focus-visible {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.7);
+}
+
+/* Filled, so the one action on the page reads as the action. */
+.studio__primary:not(:disabled) {
+  background: #fafafa;
+  border-color: #fafafa;
+  color: #17171c;
+}
+
+.studio__primary:not(:disabled):hover,
+.studio__primary:not(:disabled):focus-visible {
+  background: #fff;
+  border-color: #fff;
+}
+
+.studio__primary:disabled {
+  opacity: 0.32;
+  cursor: not-allowed;
+}
+
+.studio__ghost {
+  border-color: rgba(255, 255, 255, 0.2);
+  color: rgba(255, 255, 255, 0.72);
+}
+
+.studio__ghost:hover,
+.studio__ghost:focus-visible {
+  border-color: rgba(255, 255, 255, 0.5);
+  color: #fff;
+}
+
+/* ------------------------------------------------------- waiting / result */
+
+.studio__waiting-title,
+.studio__empty-title {
+  margin: 0;
+  font-family: "Ma Shan Zheng", "华文行楷", "STXingkai", "方正舒体", "FZShuTi",
+    "楷体", "KaiTi", "STKaiti", serif;
+  font-weight: 400;
+  font-size: clamp(2rem, 4.4vw, 3.2rem);
+  letter-spacing: 0.03em;
+}
+
+.studio__waiting-stage {
+  margin: 0;
+  font-size: 1rem;
+  letter-spacing: 0.18em;
+  color: rgba(255, 255, 255, 0.72);
+}
+
+.studio__waiting-time {
+  margin: 0;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 2.4rem;
+  letter-spacing: 0.1em;
+  color: rgba(255, 255, 255, 0.9);
+  font-variant-numeric: tabular-nums;
+}
+
+.studio__waiting-hint,
+.studio__empty-body {
+  margin: 0;
+  max-width: 34em;
+  font-size: 0.85rem;
+  line-height: 1.8;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.studio__empty-title {
+  margin-bottom: 0.4rem;
+}
+
+.studio__cta {
+  margin-top: 0.6rem;
+}
+
+.studio__result-image {
+  width: min(86vw, 420px);
+  max-height: 58vh;
+  object-fit: contain;
+  border-radius: 10px;
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.6);
+}
+
+.studio__actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 0.9rem;
+  margin-top: 0.4rem;
+}
+
+.studio__actions .studio__primary,
+.studio__actions .studio__ghost {
+  align-self: auto;
+}
+
+@media (max-width: 899px) {
+  .studio__state--form {
+    grid-template-columns: 1fr;
+    gap: 2rem;
+    padding: 11vh 6vw 8vh;
+  }
+
+  .studio__pattern {
+    display: grid;
+    grid-template-columns: 96px 1fr;
+    gap: 0 1.2rem;
+    align-items: center;
+  }
+
+  .studio__pattern-shot {
+    grid-row: 1 / span 3;
+    max-width: 96px;
+  }
+
+  .studio__eyebrow {
+    margin-top: 0;
+  }
+
+  .studio__title {
+    font-size: 2rem;
+  }
+
+  .studio__back {
+    top: 1.4rem;
+    right: 1.2rem;
+    color: rgba(255, 255, 255, 0.7);
+  }
+}
