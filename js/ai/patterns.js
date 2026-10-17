@@ -38,10 +38,12 @@ export const patterns = [
   { slug: "yizihua", title: "椅子花", meta: "椅织锦纹藏巧艺" },
   { slug: "liyuyuelongmen", title: "鲤鱼跃龙门", meta: "鲤跃锦图盼前程" },
   { slug: "yangqueniao", title: "阳雀鸟", meta: "阳雀成双载希望" },
-  // 三个待补纹样：名字定下来后改掉 title/meta 与 slug，再把对应图片放进 images/。
-  { slug: "pattern-6", title: "纹样六", meta: "待补", pending: true },
-  { slug: "pattern-7", title: "纹样七", meta: "待补", pending: true },
-  { slug: "pattern-8", title: "纹样八", meta: "待补", pending: true }
+  // 下面三个取自《衣载千年》长图（文旅来凤，2026-10-06）。同一篇里还导出了
+  // 十二勾花、梭罗树、老鼠嫁女、粑粑架 四张，已在 images/ 里备用——换上来只要
+  // 把这里的 title 改成对应文件名即可。
+  { slug: "hudieximudan", title: "蝴蝶戏牡丹", meta: "蝶戏牡丹阖家欢" },
+  { slug: "shanxinghua", title: "山兴花", meta: "山形兴旺万物生" },
+  { slug: "wanzigechuanghua", title: "万字格窗花", meta: "万字窗格福常驻" }
 ];
 
 export function patternBySlug(slug) {
