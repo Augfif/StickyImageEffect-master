@@ -4,7 +4,7 @@ import { ScrollSmoother } from "gsap/ScrollSmoother";
 
 import { Cursor } from "../Cursor.js";
 import { introBeats, introCopy } from "./beats.js";
-import { createIntroScene } from "./scene.js";
+import { createLoom } from "./cloth.js";
 import {
   buildTextLayer,
   splitTexts,
@@ -22,70 +22,83 @@ const params = new URLSearchParams(window.location.search);
 const reducedMotion =
   window.matchMedia("(prefers-reduced-motion: reduce)").matches &&
   !params.has("motion");
-const clamp = (value, min, max) => Math.min(max, Math.max(min, value));
+const coarsePointer = window.matchMedia("(pointer: coarse)").matches;
 
-// `?at=end` boots straight onto the two doors. The AI page sends the reader
-// back here, and replaying the whole opening move just to reach a pair of
-// buttons they have already seen would waste their time.
+// `?at=end` boots straight onto the two fabric cards. The AI page sends the
+// reader back here, and replaying the whole opening move just to reach a pair
+// of destinations they have already seen would waste their time.
 const atEnd = params.get("at") === "end";
 
 // --- dom ------------------------------------------------------------------
 
-const canvas = document.getElementById("intro-canvas");
 const textLayer = document.getElementById("intro-text");
 const hint = document.getElementById("intro-hint");
-const actions = document.getElementById("intro-actions");
-const mainBtn = document.getElementById("intro-action-main");
-const aiBtn = document.getElementById("intro-action-ai");
 const skipBtn = document.getElementById("intro-skip");
 const loader = document.getElementById("intro-loader");
 const curtain = document.getElementById("intro-curtain");
 const scrollEl = document.getElementById("intro-scroll");
+const loomEl = document.getElementById("loom");
+const choiceEl = document.getElementById("intro-choice");
+const choiceMain = document.getElementById("intro-choice-main");
+const choiceAi = document.getElementById("intro-choice-ai");
+const choiceReplay = document.getElementById("intro-choice-replay");
 
-// Where the two doors lead. Both pages are only ever reached from here, so the
+// Where the two cards lead. Both pages are only ever reached from here, so the
 // urls live in one place.
 const ROUTES = {
   main: "main.html",
   ai: "ai.html"
 };
 
-document.getElementById("intro-hint-label").textContent = introCopy.scrollHint;
-// innerHTML, not textContent: a label may carry the `.latin` span that sizes
-// latin runs down to the brush face, see the comment on introCopy.actions.
-document.getElementById("intro-action-main-label").innerHTML =
-  introCopy.actions.main.label;
-document.getElementById("intro-action-main-hint").textContent =
-  introCopy.actions.main.hint;
-document.getElementById("intro-action-ai-label").innerHTML =
-  introCopy.actions.ai.label;
-document.getElementById("intro-action-ai-hint").textContent =
-  introCopy.actions.ai.hint;
+document.getElementById("intro-hint-label").textContent = coarsePointer
+  ? introCopy.scrollHintTouch
+  : introCopy.scrollHint;
+document.getElementById("intro-choice-kicker").textContent =
+  introCopy.choice.kicker;
+document.getElementById("intro-choice-title").textContent =
+  introCopy.choice.title;
+document.getElementById("intro-choice-main-label").textContent =
+  introCopy.choice.main.label;
+document.getElementById("intro-choice-main-hint").textContent =
+  introCopy.choice.main.hint;
+document.getElementById("intro-choice-ai-label").textContent =
+  introCopy.choice.ai.label;
+document.getElementById("intro-choice-ai-hint").textContent =
+  introCopy.choice.ai.hint;
+choiceReplay.textContent = introCopy.choice.replay;
 skipBtn.textContent = introCopy.skip;
 
 // Same ring the slideshow draws, and base.css already hides the native one.
 new Cursor(document.querySelector(".cursor"));
 
-const scene = createIntroScene(canvas, introBeats, { reduced: reducedMotion });
 const progress = createProgress({
   fill: document.getElementById("intro-progress-fill"),
   value: document.getElementById("intro-progress-value")
 });
 const layer = buildTextLayer(textLayer, introBeats, introCopy);
 
-// One screen of scroll per beat, plus a screen and a bit for the opening move.
-scrollEl.style.height = `${introBeats.length * 92 + 70}svh`;
-
-// --- timeline maths -------------------------------------------------------
-
 const beatCount = introBeats.length;
-// The opening move owns the first slice of the scroll, the beats share the
-// rest; both the camera and the copy use these two numbers so they stay in
-// step.
-const HERO_SHARE = 0.05;
-const SPAN = 1 - HERO_SHARE;
+const totalPanels = beatCount + 1;
+scrollEl.style.height = `${totalPanels * 100}svh`;
+
+// The title cloth owns the first panel; the ten beats share the rest, then the
+// final eight percent holds the last pattern while the fork fades in.
+const HERO_SHARE = 1 / totalPanels;
+const FORK_SHARE = 0.08;
+const LAST_CENTER = 1 - FORK_SHARE;
+const SPAN = LAST_CENTER - HERO_SHARE;
 const centerFor = index => HERO_SHARE + (index / (beatCount - 1)) * SPAN;
 const halfWindow = SPAN / (beatCount - 1) / 2;
-const cameraProgress = p => clamp((p - HERO_SHARE) / SPAN, 0, 1);
+
+const loom = createLoom({
+  root: loomEl,
+  cloth: document.getElementById("loom-cloth"),
+  beats: introBeats,
+  totalPanels,
+  lastCenter: LAST_CENTER
+});
+
+// --- timeline maths -------------------------------------------------------
 
 let smoother = null;
 let splits = null;
@@ -93,19 +106,29 @@ let splits = null;
 // only be shown from then on, or it would be clickable while the scroll it
 // drives is still locked.
 let scrollReady = false;
+let choiceVisible = false;
 
-// Faded out is not the same as unreachable: the doors sit in the dom from the
-// first frame, so without this a reader tabbing through the opener would land
-// on two invisible buttons. With a single button that was untidy, with two it
-// is two stops on nothing.
 function setReachable(element, reachable) {
   element.tabIndex = reachable ? 0 : -1;
 }
 
-function revealActions(visible) {
-  actions.classList.toggle("is-visible", visible);
-  setReachable(mainBtn, visible);
-  setReachable(aiBtn, visible);
+function revealChoice(visible) {
+  if (choiceVisible === visible) return;
+  choiceVisible = visible;
+  choiceEl.classList.toggle("is-visible", visible);
+  choiceEl.setAttribute("aria-hidden", String(!visible));
+  document.body.classList.toggle("is-choice", visible);
+  setReachable(choiceMain, visible);
+  setReachable(choiceAi, visible);
+  setReachable(choiceReplay, visible);
+
+  if (visible) {
+    loom.show(false);
+    hint.classList.remove("is-visible");
+    revealSkip(false);
+  } else {
+    loom.show(true);
+  }
 }
 
 function revealSkip(visible) {
@@ -114,10 +137,20 @@ function revealSkip(visible) {
 }
 
 function lockScroll(locked) {
-  // Before the smoother exists the lock is plain css; once it is running the
-  // plugin owns the scroll and pausing it is enough.
   if (smoother) smoother.paused(locked);
   document.documentElement.classList.toggle("intro-locked", locked && !smoother);
+}
+
+function applyProgress(p) {
+  loom.setProgress(p);
+  progress.set(p);
+
+  // The cloth reaches its fork at the very end. Leaving a small lead-in keeps
+  // the last pattern readable before the cards take over.
+  const atFork = p > 0.97;
+  revealChoice(atFork);
+  revealSkip(scrollReady && !atFork && p <= 0.97);
+  hint.classList.toggle("is-gone", p > 0.02 || atFork);
 }
 
 function enterSite(url) {
@@ -127,44 +160,57 @@ function enterSite(url) {
   }, 420);
 }
 
-// Distance to the end of the opener, in the same units ScrollSmoother clamps
-// its own scrollTop against, so ask ScrollTrigger rather than guess from
-// scrollHeight (the smoother pins the wrapper and drives the native scroll).
 const endScroll = () => Math.max(0, ScrollTrigger.maxScroll(window));
 
 function scrollToActions() {
   const target = endScroll();
 
   if (smoother) {
-    // Tween the plugin's own scrollTop: every frame writes a new native scroll
-    // position, so the corridor and the beat copy scrub all the way down
-    // instead of the page jumping and the content easing in afterwards.
     gsap.to(smoother, {
       scrollTop: target,
-      duration: 1.2,
+      duration: reducedMotion ? 0.25 : 1.2,
       ease: "power2.inOut",
       overwrite: true
     });
     return;
   }
 
-  window.scrollTo({ top: target, behavior: "smooth" });
+  window.scrollTo({
+    top: target,
+    behavior: reducedMotion ? "auto" : "smooth"
+  });
 }
 
-mainBtn.addEventListener("click", () => enterSite(ROUTES.main));
-aiBtn.addEventListener("click", () => enterSite(ROUTES.ai));
-skipBtn.addEventListener("click", scrollToActions);
-
-window.addEventListener("resize", () => scene.resize());
-window.addEventListener("keydown", event => {
-  if (event.key !== "Enter") return;
-  if (!actions.classList.contains("is-visible")) return;
-  // Enter on a focused button already activates it. Only the "nothing is
-  // focused" case needs the shortcut, otherwise the door would fire twice.
-  if (event.target === mainBtn || event.target === aiBtn || event.target === skipBtn) {
+function replay() {
+  revealChoice(false);
+  if (smoother) {
+    gsap.to(smoother, {
+      scrollTop: 0,
+      duration: reducedMotion ? 0.25 : 1.2,
+      ease: "power2.inOut",
+      overwrite: true
+    });
     return;
   }
+  window.scrollTo({ top: 0, behavior: reducedMotion ? "auto" : "smooth" });
+}
+
+choiceMain.addEventListener("click", event => {
+  event.preventDefault();
   enterSite(ROUTES.main);
+});
+choiceAi.addEventListener("click", event => {
+  event.preventDefault();
+  enterSite(ROUTES.ai);
+});
+choiceReplay.addEventListener("click", replay);
+skipBtn.addEventListener("click", scrollToActions);
+
+window.addEventListener("resize", () => {
+  const label = document.getElementById("intro-hint-label");
+  label.textContent = window.matchMedia("(pointer: coarse)").matches
+    ? introCopy.scrollHintTouch
+    : introCopy.scrollHint;
 });
 
 // --- wiring ---------------------------------------------------------------
@@ -186,7 +232,12 @@ function wireScroll() {
   }
 
   splits = splitTexts(layer);
-  heroExitTimeline(layer.hero.el, splits.heroChars, scrollEl);
+  heroExitTimeline(
+    layer.hero.el,
+    splits.heroChars,
+    scrollEl,
+    HERO_SHARE
+  );
 
   layer.blocks.forEach((block, index) => {
     if (!block) return;
@@ -194,43 +245,35 @@ function wireScroll() {
     beatTimeline(
       splits.beatChars[index],
       scrollEl,
-      (center - halfWindow) * 100,
-      (center + halfWindow) * 100
+      center - halfWindow,
+      center + halfWindow
     );
   });
 
-  ScrollTrigger.create({
+  const pageTrigger = ScrollTrigger.create({
     trigger: scrollEl,
     start: "top top",
     end: "bottom bottom",
-    onUpdate: self => {
-      const p = self.progress;
-      scene.setProgress(cameraProgress(p));
-      progress.set(p);
-      revealActions(p > 0.965);
-      // The doors are on screen, so the shortcut to them has done its job.
-      revealSkip(scrollReady && p <= 0.965);
-      hint.classList.toggle("is-gone", p > 0.02);
-    }
+    onUpdate: self => applyProgress(self.progress)
+  });
+
+  // A resize rebuilds ScrollTrigger's measurements without necessarily firing
+  // onUpdate. Re-apply the current state so the fork cannot disappear at 100%.
+  ScrollTrigger.addEventListener("refresh", () => {
+    applyProgress(pageTrigger.progress);
   });
 }
 
 function runOpening() {
-  const blend = { value: 1 };
-  const duration = reducedMotion ? 0.5 : 3.4;
   const tl = gsap.timeline();
 
-  tl.to(
-    blend,
-    {
-      value: 0,
-      duration,
-      ease: "power2.inOut",
-      onUpdate: () => scene.setIntroBlend(blend.value)
-    },
+  tl.fromTo(
+    loomEl,
+    { opacity: 0, scale: 1.015 },
+    { opacity: 1, scale: 1, duration: reducedMotion ? 0.35 : 1.1, ease: "power2.out" },
     0
   );
-  tl.add(heroTimeline(splits.heroChars, reducedMotion ? 0.05 : 0.6), 0);
+  tl.add(heroTimeline(splits.heroChars, reducedMotion ? 0.05 : 0.25), 0);
   tl.call(
     () => {
       lockScroll(false);
@@ -239,23 +282,33 @@ function runOpening() {
       revealSkip(true);
     },
     null,
-    Math.max(0.2, duration - 0.25)
+    reducedMotion ? 0.35 : 1.05
   );
+}
+
+async function preloadImages() {
+  const load = Promise.all(
+    introBeats.map(
+      beat =>
+        new Promise(resolve => {
+          const image = new Image();
+          image.onload = resolve;
+          image.onerror = resolve;
+          image.src = beat.image;
+        })
+    )
+  );
+  const timeout = new Promise(resolve => window.setTimeout(resolve, 2200));
+  await Promise.race([load, timeout]);
 }
 
 async function boot() {
   lockScroll(true);
-  // Landing on the doors means landing on the last beat, so the camera starts
-  // on its final pose instead of the entry pose outside the corridor.
-  scene.setProgress(atEnd ? 1 : 0);
-  scene.setIntroBlend(atEnd ? 0 : 1);
-  scene.start();
+  loom.setProgress(atEnd ? 1 : 0);
 
-  await scene.load();
-  // Let the loader animation finish its arc before the opening move. Landing
-  // on the doors skips the move, so there is nothing long to wait for.
+  await preloadImages();
   await new Promise(resolve =>
-    window.setTimeout(resolve, reducedMotion || atEnd ? 120 : 900)
+    window.setTimeout(resolve, reducedMotion || atEnd ? 80 : 420)
   );
 
   loader.classList.add("is-gone");
@@ -263,20 +316,18 @@ async function boot() {
 
   if (atEnd) {
     lockScroll(false);
-    // The skip button is the way back down, so it has to be armed here too:
-    // the reader can still scroll up into the corridor from the doors, and
-    // without this it stayed hidden for the whole way back. The scroll trigger
-    // keeps it out of sight while the doors themselves are on screen.
     scrollReady = true;
-    // The beat windows are measured off the scroll length, so all that is left
-    // is to put the scroll where the doors live. No animation: the reader
-    // asked to arrive, not to travel.
     ScrollTrigger.refresh();
     if (smoother) smoother.scrollTop(endScroll());
     else window.scrollTo(0, endScroll());
+    revealChoice(true);
     return;
   }
 
+  // A reload can restore the previous scroll position after the browser has
+  // already painted the first frame. Put the strip back on its title panel.
+  if (smoother) smoother.scrollTop(0);
+  else window.scrollTo(0, 0);
   runOpening();
 }
 

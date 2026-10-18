@@ -12,6 +12,9 @@
   <link rel="stylesheet" type="text/css" href="css/base.css" />
   <link rel="stylesheet" type="text/css" href="css/intro.css" />
   <script>
+    if ("scrollRestoration" in history) {
+      history.scrollRestoration = "manual";
+    }
     document.documentElement.className = "js";
   </script>
 </head>
@@ -25,7 +28,14 @@
     </div>
   </div>
 
-  <canvas id="intro-canvas"></canvas>
+  <!-- One continuous cloth. The panels are built from introBeats, so the
+       sequence scrolls through a single object instead of swapping slides. -->
+  <div class="loom" id="loom" aria-hidden="true">
+    <div class="loom__warp"></div>
+    <div class="loom__cloth" id="loom-cloth"></div>
+    <div class="loom__beam loom__beam--top"></div>
+    <div class="loom__beam loom__beam--bottom"></div>
+  </div>
   <div class="intro-vignette"></div>
 
   <!-- One block per beat, filled in by js/intro/index.js -->
@@ -45,19 +55,44 @@
     <span class="intro-progress__value" id="intro-progress-value">000%</span>
   </div>
 
-  <!-- The two doors at the end of the scroll. Both start out unfocusable
-       (tabindex="-1") and are made reachable when they fade in, see
-       revealActions() in js/intro/index.js. -->
-  <div class="intro-actions" id="intro-actions">
-    <button class="intro-action" id="intro-action-main" type="button" tabindex="-1">
-      <span class="intro-action__label" id="intro-action-main-label"></span>
-      <span class="intro-action__hint" id="intro-action-main-hint"></span>
-    </button>
-    <button class="intro-action" id="intro-action-ai" type="button" tabindex="-1">
-      <span class="intro-action__label" id="intro-action-ai-label"></span>
-      <span class="intro-action__hint" id="intro-action-ai-hint"></span>
-    </button>
-  </div>
+  <!-- The fork at the end of the cloth: two fabric cards instead of two
+       floating pills. Kept in the DOM as links so phones get real tap targets
+       and keyboards can reach both destinations. -->
+  <section class="loom-choice" id="intro-choice" aria-hidden="true">
+    <div class="loom-choice__panel">
+      <p class="loom-choice__kicker" id="intro-choice-kicker"></p>
+      <h2 class="loom-choice__title" id="intro-choice-title"></h2>
+
+      <div class="loom-choice__cards">
+        <a class="loom-card loom-card--gallery" id="intro-choice-main" href="main.html" tabindex="-1">
+          <span class="loom-card__media"></span>
+          <span class="loom-card__copy">
+            <span class="loom-card__top">
+              <span class="loom-card__index">01</span>
+              <span class="loom-card__arrow" aria-hidden="true">↗</span>
+            </span>
+            <span class="loom-card__name" id="intro-choice-main-label"></span>
+            <span class="loom-card__hint" id="intro-choice-main-hint"></span>
+          </span>
+        </a>
+
+        <a class="loom-card loom-card--ai" id="intro-choice-ai" href="ai.html" tabindex="-1">
+          <span class="loom-card__media"></span>
+          <span class="loom-card__swatch" aria-hidden="true"></span>
+          <span class="loom-card__copy">
+            <span class="loom-card__top">
+              <span class="loom-card__index">02</span>
+              <span class="loom-card__arrow" aria-hidden="true">↗</span>
+            </span>
+            <span class="loom-card__name" id="intro-choice-ai-label"></span>
+            <span class="loom-card__hint" id="intro-choice-ai-hint"></span>
+          </span>
+        </a>
+      </div>
+
+      <button class="loom-choice__replay" id="intro-choice-replay" type="button" tabindex="-1"></button>
+    </div>
+  </section>
 
   <button class="intro-skip" id="intro-skip" type="button" tabindex="-1"></button>
 

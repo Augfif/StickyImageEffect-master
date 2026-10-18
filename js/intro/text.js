@@ -104,12 +104,12 @@ export function heroTimeline(heroChars, delay = 0.35) {
     );
 }
 
-export function heroExitTimeline(heroEl, heroChars, scrollEl) {
+export function heroExitTimeline(heroEl, heroChars, scrollEl, endFraction = 0.05) {
   return gsap.timeline({
     scrollTrigger: {
       trigger: scrollEl,
-      start: "0% top",
-      end: "5% top",
+      start: 0,
+      end: () => endFraction * ScrollTrigger.maxScroll(window),
       scrub: 0.28
     }
   }).to(heroChars, {
@@ -121,14 +121,17 @@ export function heroExitTimeline(heroEl, heroChars, scrollEl) {
   });
 }
 
-export function beatTimeline(chars, scrollEl, startPercent, endPercent) {
+export function beatTimeline(chars, scrollEl, startFraction, endFraction) {
   if (!chars.length) return null;
   return gsap
     .timeline({
       scrollTrigger: {
         trigger: scrollEl,
-        start: `${startPercent}% top`,
-        end: `${endPercent}% top`,
+        // Pixel positions measured against the same max scroll the progress
+        // bar reports. Percentage-of-element starts drift by one viewport as
+        // the document gets longer, which made later labels miss their fabric.
+        start: () => Math.max(0, startFraction * ScrollTrigger.maxScroll(window)),
+        end: () => Math.max(0, endFraction * ScrollTrigger.maxScroll(window)),
         scrub: 0.28
       }
     })

@@ -1,13 +1,13 @@
-import yanqianghua from "../../images/岩墙花.jpg";
-import jiumeihua from "../../images/九朵梅.jpg";
-import yizihua from "../../images/椅子花.jpg";
-import liyu from "../../images/鲤鱼跃龙门.jpg";
-import yangqueniao from "../../images/阳雀鸟.jpg";
-import sishibagou from "../../images/四十八勾.jpg";
-import shanxinghua from "../../images/山兴花.jpg";
-import babajia from "../../images/粑粑架.jpg";
-import wanzigechuanghua from "../../images/万字格窗花.jpg";
-import laoshujianv from "../../images/老鼠嫁女.jpg";
+import rock from "../../images/opening/rock-crop.jpg";
+import plum from "../../images/opening/plum-crop.jpg";
+import chair from "../../images/opening/chair.jpg";
+import carp from "../../images/opening/carp.jpg";
+import magpie from "../../images/opening/magpie-crop.jpg";
+import hook from "../../images/opening/hook.jpg";
+import catfoot from "../../images/opening/catfoot-crop.jpg";
+import dragonphoenix from "../../images/opening/dragonphoenix-crop.jpg";
+import suoluo from "../../images/opening/suoluo-crop.jpg";
+import mouse from "../../images/opening/mouse.jpg";
 
 /**
  * The only file you need to edit for the opener.
@@ -17,17 +17,67 @@ import laoshujianv from "../../images/老鼠嫁女.jpg";
  * joins the sequence -- the camera flies past a dark empty frame with no copy.
  */
 export const introBeats = [
-  { image: yanqianghua, title: "岩墙花", meta: "最难岩墙椅子花" },
-  { image: jiumeihua, title: "九朵梅", meta: "九梅含韧久安康" },
-  { image: yizihua, title: "椅子花", meta: "椅织锦纹藏巧艺" },
-  { image: liyu, title: "鲤鱼跃龙门", meta: "鲤跃锦图盼前程" },
-  { image: yangqueniao, title: "阳雀鸟", meta: "阳雀成双载希望" },
+  {
+    image: rock,
+    title: "岩墙花",
+    meta: "最难岩墙椅子花",
+    fabric: { x: 50, y: 50, zoom: 1.04 }
+  },
+  {
+    image: plum,
+    title: "九朵梅",
+    meta: "九梅含韧久安康",
+    fabric: { x: 50, y: 50, zoom: 1.04 }
+  },
+  {
+    image: chair,
+    title: "椅子花",
+    meta: "椅织锦纹藏巧艺",
+    fabric: { x: 50, y: 50, zoom: 1.05 }
+  },
+  {
+    image: carp,
+    title: "鲤鱼跃龙门",
+    meta: "鲤跃锦图盼前程",
+    fabric: { x: 50, y: 50, zoom: 1.05 }
+  },
+  {
+    image: magpie,
+    title: "阳雀花",
+    meta: "阳雀成双载希望",
+    fabric: { x: 50, y: 50, zoom: 1.04 }
+  },
   // 后五个纹样的 meta 也压成七字，与前五条同一节奏。
-  { image: sishibagou, title: "四十八勾", meta: "四十八勾巧相扣" },
-  { image: shanxinghua, title: "山兴花", meta: "山形兴旺万物生" },
-  { image: babajia, title: "粑粑架", meta: "五谷丰登仓廪盈" },
-  { image: wanzigechuanghua, title: "万字格窗花", meta: "万字窗格福常驻" },
-  { image: laoshujianv, title: "老鼠嫁女", meta: "鼠嫁喜临婚姻美" }
+  {
+    image: hook,
+    title: "四十八勾",
+    meta: "四十八勾巧相扣",
+    fabric: { x: 50, y: 50, zoom: 1.05 }
+  },
+  {
+    image: catfoot,
+    title: "猫脚迹花",
+    meta: "山形兴旺万物生",
+    fabric: { x: 50, y: 50, zoom: 1.04 }
+  },
+  {
+    image: dragonphoenix,
+    title: "龙凤呈祥",
+    meta: "五谷丰登仓廪盈",
+    fabric: { x: 50, y: 50, zoom: 1.04 }
+  },
+  {
+    image: suoluo,
+    title: "梭罗树",
+    meta: "万字窗格福常驻",
+    fabric: { x: 50, y: 50, zoom: 1.04 }
+  },
+  {
+    image: mouse,
+    title: "老鼠嫁女",
+    meta: "鼠嫁喜临婚姻美",
+    fabric: { x: 50, y: 50, zoom: 1.05 }
+  }
 ];
 
 export const introCopy = {
@@ -40,10 +90,14 @@ export const introCopy = {
   // bring it down to the width of one brush glyph: the opener draws its copy in
   // STXingkai, whose latin is both wider and heavier than its chinese, and an
   // unmarked "AI" ended up occupying a glyph and a half next to the 互动.
-  actions: {
-    main: { label: "赏织锦", hint: "浏览织锦纹样" },
-    ai: { label: '<span class="latin">AI</span>互动', hint: "生成造型" }
+  choice: {
+    kicker: "土家织锦 · 目录",
+    title: "这匹布，接下来怎么用？",
+    main: { label: "赏织锦", hint: "十幅纹样 · 左右拖动浏览" },
+    ai: { label: "AI 互动", hint: "上传照片 · 换料生成" },
+    replay: "重看开场"
   },
   skip: "跳过",
-  scrollHint: "向下滚动"
+  scrollHint: "向下滚动",
+  scrollHintTouch: "向上滑动"
 };
