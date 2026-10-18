@@ -1,8 +1,10 @@
 const lerp = (a, b, n) => (1 - n) * a + n * b;
 const body = document.body;
-// The ring is the only pointer on the page now (the native one is hidden in
-// css), so it follows a touch tighter than the 0.15 it used to share with the
-// dot.
+// Touch screens have no hovering pointer to chase; the native cursor stays and
+// the ring is never started, which also saves a permanent rAF loop on phones.
+const FINE_POINTER = window.matchMedia("(hover: hover) and (pointer: fine)");
+// On fine pointers the ring is the only cursor (the native one is hidden in
+// css), so it follows tighter than the 0.15 it used to share with the dot.
 const FOLLOW = 0.22;
 const getMousePos = (e) => {
     let posx = 0;
@@ -22,6 +24,10 @@ const getMousePos = (e) => {
 class Cursor {
     constructor(el) {
         this.DOM = {el: el};
+        if (!FINE_POINTER.matches) {
+            this.DOM.el.remove();
+            return;
+        }
         this.DOM.circle = this.DOM.el.querySelector('.cursor__inner--circle');
         this.bounds = {circle: this.DOM.circle.getBoundingClientRect()};
         this.scale = 1;
