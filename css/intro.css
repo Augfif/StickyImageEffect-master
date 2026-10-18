@@ -447,14 +447,19 @@ html::-webkit-scrollbar {
   background:
     radial-gradient(circle at 50% 8%, rgba(160, 55, 40, 0.2), transparent 48%),
     #0b0b0f;
+  /* The directory opens out of the width of the cloth, as if the strip were
+     being parted, instead of arriving as an unrelated full-screen fade. */
+  clip-path: inset(0 27vw 0 27vw);
   opacity: 0;
   visibility: hidden;
   pointer-events: none;
   transition: opacity 550ms cubic-bezier(0.2, 1, 0.3, 1),
-    visibility 550ms;
+    visibility 550ms,
+    clip-path 760ms cubic-bezier(0.2, 1, 0.3, 1);
 }
 
 .loom-choice.is-visible {
+  clip-path: inset(0 0 0 0);
   opacity: 1;
   visibility: visible;
   pointer-events: auto;
@@ -774,6 +779,11 @@ body.is-choice .intro-skip {
   .loom-choice {
     padding: max(1rem, env(safe-area-inset-top)) 1rem
       max(1rem, env(safe-area-inset-bottom));
+    clip-path: inset(0 20vw 0 20vw);
+  }
+
+  .loom-choice.is-visible {
+    clip-path: inset(0 0 0 0);
   }
 
   .loom-choice__kicker {
