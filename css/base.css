@@ -1,3 +1,14 @@
+/* Shared brush face. It lives in base.css because every entry uses it: the
+   opener and the AI grid do not load styles.css, and mobile browsers have no
+   Chinese calligraphy system font to fall back to. */
+@font-face {
+  font-family: "Ma Shan Zheng";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("../fonts/MaShanZheng-Regular.woff2") format("woff2");
+}
+
 article,
 aside,
 details,

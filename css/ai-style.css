@@ -1,17 +1,6 @@
 /* The styled-look generator. Same room as the opener and the grid: the radial
    gradient keeps the three pages reading as one place. */
 
-/* Self hosted here for the same reason ai.css never was: the opener does not
-   load styles.css, so it leans on a system calligraphy face, while this page
-   should look identical on the judging laptop. */
-@font-face {
-  font-family: "Ma Shan Zheng";
-  font-style: normal;
-  font-weight: 400;
-  font-display: swap;
-  src: url("../fonts/MaShanZheng-Regular.woff2") format("woff2");
-}
-
 html,
 body {
   min-height: 100%;

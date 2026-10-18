@@ -1,13 +1,3 @@
-/* Brush/calligraphy face for Chinese titles, self hosted so it renders the
-   same everywhere. Local Windows calligraphy fonts stay as fallbacks. */
-@font-face {
-  font-family: "Ma Shan Zheng";
-  font-style: normal;
-  font-weight: 400;
-  font-display: swap;
-  src: url("../fonts/MaShanZheng-Regular.woff2") format("woff2");
-}
-
 html,
 body {
   /* Keep the browser from bouncing / pull-to-refresh while dragging. */
