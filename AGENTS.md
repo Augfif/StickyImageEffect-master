@@ -77,11 +77,12 @@ index.html main.html        # 幻灯片与开场页
 ai.html ai-style.html       # AI 网格与造型生成
 base.html                   # 遗留模板页，不构建
 css/
-  base.css                  # reset + 配色变量 + 自定义光标 + 加载动画
+  base.css                  # reset + 配色变量 + 原生指针 + 加载动画
   intro.css                 # 只属于开场页
   styles.css                # 只属于主界面（含 @font-face 与响应式断点）
 fonts/                      # MaShanZheng 毛笔字体（自托管）
 images/                     # 页面真正引用的素材：原图 + 同名 -depth.png + 纹样多角度 -2/-3.jpg
+images/opening/             # 开场布匹用的织物扫描图（已裁边、压缩）
 images/ai/                  # 生成请求用的默认配饰与椅子
 tujia/                      # 原图投放目录，depth 工具从这里同步到 images/
 js/
@@ -93,11 +94,11 @@ js/
   Slides.js                 # 幻灯片的 DOM 文案层 + 「阅读」状态
   Sheet.js                  # 毛玻璃白色内容面板（拖拽 + 弹簧）
   Progress.js               # 右侧竖向进度条
-  Cursor.js                 # 自绘光标圆环（两页共用）
   reach.js                  # 极简缓动，主界面内部用，非 popmotion
   intro/
     index.js                # 开场页组装入口
-    scene.js                # 走廊场景：10 个版面 + 相机曲线
+    cloth.js                # 连续布匹：每段一个 100svh 织物面板
+    scene.js                # 旧走廊方案，已不引用，仅作历史参考
     text.js                 # 文案层：SplitText + ScrollTrigger 时间线
     beats.js                # ★ 开场页唯一需要改内容的文件
     progress.js             # 底部进度条
@@ -137,16 +138,17 @@ codrops-grid-to-preview/    # AI 互动页的参考工程（.gitignore，不入�
 4. `GLManager.js` 持有 renderer / camera / 唯一一块 Plane；平铺 `u_mouse` 做视差并给整块平面加轻微 tilt。
 5. `shaders.js` 里片元着色器按深度图逐像素偏移采样（**亮 = 近**），顶点着色器负责凸起与波动。
 6. 渲染是**按需触发**的：`render()` 在材质变化时手动调用；只有拖拽期间 `scheduleLoop()` 才开 rAF 循环。
-7. DOM 层互不耦合：`Slides` 管文案与 class 状态，`Progress` 管右侧进度条，`Sheet` 管白色内容面板，`Cursor` 管圆环。
+7. DOM 层互不耦合：`Slides` 管文案与 class 状态，`Progress` 管右侧进度条，`Sheet` 管白色内容面板。
    `Sheet` 打开时 `Showcase.setLocked(true)` 锁住手势，`Slides.setReading()` 用指数跟随把文案送到画面中心。
 
 ### 开场页（index.html）
 
-1. `js/intro/beats.js` 的 `introBeats` 是十条内容，`image: null` 是没补图的占位（目前 5 张真图 + 5 个空位）。
-2. `js/intro/scene.js` 由数组**推导**出走廊：左右交替、逐 beat 后退的版面位置，加一条 `CatmullRomCurve3` 相机曲线 —— 不需要手工摆放十个机位。
-3. `text.js` 用 `SplitText` 按字拆分，`beatTimeline()` 给每个 beat 生成 scrub 时间线。
-4. `js/intro/index.js` 负责启动流程：锁滚动 → 加载贴图 → 开场推镜 `runOpening()` → 解锁滚动；`ScrollSmoother` 只在非 reduced-motion 下创建。
-5. 滚到最后出现「开始」按钮，`enterSite()` 用幕布遮罩后跳转 `main.html`。
+1. `js/intro/beats.js` 的 `introBeats` 是十段织物与文案，`fabric` 控制微距聚焦和缩放。
+2. `js/intro/cloth.js` 把每段做成 100svh 布匹面板，整条布匹随滚动 `translateY`，标题在左、释义在右。
+3. `text.js` 用 `SplitText` 按字拆分；ScrollTrigger 的时间点按 `maxScroll` 计算，保证文字窗口和布匹段落对齐。
+4. `js/intro/index.js` 负责预加载、ScrollSmoother、进度条和结尾选择页；`ScrollSmoother` 只在非 reduced-motion 下创建。
+5. 滚到约 97% 时，最后一段织物压暗，选择页从布匹宽度向两侧展开成「赏织锦 / AI 互动」两张布样卡。
+6. `enterSite()` 用幕布遮罩后跳转对应页面；`scene.js` 是旧走廊方案，已不再引用。
 
 ## 必须保持同步的常量
 
@@ -186,7 +188,7 @@ AI 网格的素材不走 `depth` 流程：直接把 `<纹样名>.jpg`（整体�
 - **注释写英文，面向用户的文案写中文**（`beats.js` 的标题、`Sheet` 的「介绍」等）。
   注释重点解释「为什么这么做」，现状已经有很多这样的说明，改动时请保持这个习惯。
 - 模块一律 ESM。文件内部风格保持原样：`GLManager` / `Showcase` 用原型方法，
-  `Slides` / `Sheet` / `Cursor` / `Progress` 用 class，不要为了统一而重写。
+  `Slides` / `Sheet` / `Progress` 用 class，不要为了统一而重写。
 - CSS 是手写的，没有预处理器；主题值走 CSS 自定义属性（`--color-*`、`--progress`）。
 - 引入新依赖前先确认必要性。`three` 是 **r101**，网上大部分新 API（`ColorManagement`、
   `PlaneGeometry` 的新签名、`WebGLRenderer.outputEncoding` 等）在这里都不存在。
@@ -197,8 +199,8 @@ AI 网格的素材不走 `depth` 流程：直接把 `<纹样名>.jpg`（整体�
   并拉成正方形。现在关掉 mipmap + `LinearFilter`，2048 的原图按原分辨率上传，改回去图会糊。
 - **主界面不响应滚轮。** 翻页是按住拖拽（`Grab.js`），别指望加 `wheel` 监听能接上；
   同理 `#app` 上有个 `scroll` 监听把 `scrollTop` 钉回 0，是防止聚焦元素把构图顶偏的。
-- **原生光标被全局关掉了**（`css/base.css` 里 `cursor: none !important`），页面上的指针一律是
-  `Cursor.js` 画的圆环。新增可点元素不需要自己写 `cursor: pointer`。
+- **页面使用原生鼠标指针**。不要重新加全局 `cursor: none`；按钮、链接和可拖拽区域各自的
+  `cursor: pointer` / `grab` / `grabbing` 会正常显示。
 - `prefers-reduced-motion: reduce` 会走压缩过的短动画。想在开了这个设置的环境下预览完整版，
   加查询参数：`/?motion=full`、`/main.html?motion=full`。
 - `.gitignore` 里点名忽略的几个目录（`fake3d-master/`、`ultranoir-dump/`、

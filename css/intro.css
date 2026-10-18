@@ -277,6 +277,12 @@ html::-webkit-scrollbar {
   transform: translate(-50%, -50%);
 }
 
+.beat--hero {
+  flex-direction: column;
+  align-items: center;
+  gap: 1.4rem;
+}
+
 .beat__title {
   margin: 0;
   writing-mode: vertical-rl;
@@ -303,12 +309,18 @@ html::-webkit-scrollbar {
 
 .beat--hero .beat__title {
   font-size: clamp(3rem, 6vw, 6rem);
-  letter-spacing: 0.04em;
+  letter-spacing: 0.12em;
 }
 
 .beat--hero .beat__meta {
-  margin-top: 3.8rem;
+  margin: 0;
+  width: min(60vw, 560px);
+  writing-mode: horizontal-tb;
+  text-orientation: mixed;
+  text-align: center;
   font-size: clamp(0.62rem, 1.1vw, 0.82rem);
+  letter-spacing: 0.14em;
+  line-height: 1.9;
 }
 
 /* ------------------------------------------------------------- chrome -- */
@@ -799,8 +811,11 @@ body.is-choice .intro-skip {
   }
 
   .beat--hero .beat__meta {
-    margin-top: 2.2rem;
-    font-size: 0.58rem;
+    width: min(72vw, 380px);
+    margin-top: 0;
+    font-size: 0.62rem;
+    letter-spacing: 0.08em;
+    line-height: 1.8;
   }
 
   .intro-progress {

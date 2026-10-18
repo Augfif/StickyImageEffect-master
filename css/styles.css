@@ -166,7 +166,7 @@ canvas {
 }
 
 /* Hovering the copy floats the whole block up, so the text reads as lifting
-   inside the cursor ring. Deliberately no scale: a 5rem brush glyph goes soft
+   clear of the image. Deliberately no scale: a 5rem brush glyph goes soft
    the moment it is scaled. While the glass pane is open js writes a transform
    on .slide-copy itself -- a different element -- so hovering the centred copy
    cannot fight the animation the panel is driving. */

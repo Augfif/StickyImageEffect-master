@@ -81,17 +81,12 @@ export const introBeats = [
 ];
 
 export const introCopy = {
-  title: "土家织锦",
-  subtitle: "十幅纹样，十种祝愿",
-  // The two doors at the end of the scroll. `hint` is the small second line
-  // inside the ring -- keep it short enough to sit on one line.
-  //
-  // A label may carry markup. `.latin` wraps a run of latin letters so css can
-  // bring it down to the width of one brush glyph: the opener draws its copy in
-  // STXingkai, whose latin is both wider and heavier than its chinese, and an
-  // unmarked "AI" ended up occupying a glyph and a half next to the 互动.
+  title: "织造万象",
+  subtitle: "——土家织锦服饰数字展与沉浸式 AI 交互体验",
+  // The two fabric cards at the end of the scroll. Keep each hint short
+  // enough to sit on one line.
   choice: {
-    kicker: "土家织锦 · 目录",
+    kicker: "织造万象 · 目录",
     title: "这匹布，接下来怎么用？",
     main: { label: "赏织锦", hint: "十幅纹样 · 左右拖动浏览" },
     ai: { label: "AI 互动", hint: "上传照片 · 换料生成" },

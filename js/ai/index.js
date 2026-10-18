@@ -1,4 +1,3 @@
-import { Cursor } from "../Cursor.js";
 import { aiCopy } from "./copy.js";
 import { patterns, shotsForPattern } from "./patterns.js";
 import { createGridPreview, preloadImages } from "./grid-preview.js";
@@ -51,10 +50,6 @@ list.append(...tiles);
 root.append(list);
 
 createGridPreview(root);
-
-// base.css hides the native pointer on every element, so this page has to draw
-// its own ring like the opener and the slideshow do.
-new Cursor(document.querySelector(".cursor"));
 
 preloadImages(root.querySelectorAll("img")).then(() => {
   document.body.classList.remove("gp-loading");

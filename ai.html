@@ -4,11 +4,11 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <title>AI 互动 | 土家织锦</title>
+  <title>AI 互动 | 织造万象</title>
   <meta name="description" content="悬停一幅织锦，看它的各个角度；点进去，用 AI 把它换到你自己的造型上。" />
   <link rel="shortcut icon" href="favicon.ico" />
-  <!-- base.css brings the shared reset, the hidden native cursor and the
-       self drawn ring; ai.css only owns this page. -->
+  <!-- base.css brings the shared reset and native pointer styles; ai.css only
+       owns this page. -->
   <link rel="stylesheet" type="text/css" href="css/base.css" />
   <link rel="stylesheet" type="text/css" href="css/ai.css" />
   <script>
@@ -25,10 +25,6 @@
        the picture file names and the links have one home. createGridPreview()
        then builds both preview panes out of those tiles. -->
   <div class="gp" id="grid"></div>
-
-  <div class="cursor">
-    <div class="cursor__inner cursor__inner--circle"></div>
-  </div>
 
   <script type="module" src="/js/ai/index.js"></script>
 </body>

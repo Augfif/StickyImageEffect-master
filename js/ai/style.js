@@ -1,4 +1,3 @@
-import { Cursor } from "../Cursor.js";
 import { aiCopy } from "./copy.js";
 import { patternBySlug, shotsForPattern } from "./patterns.js";
 import accessoryUrl from "../../images/ai/accessory.png";
@@ -376,6 +375,3 @@ ui.retry.addEventListener("click", () => {
   setError("");
   show("form");
 });
-
-// base.css hides the native pointer on every element.
-new Cursor(document.querySelector(".cursor"));

@@ -2,7 +2,6 @@ import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { ScrollSmoother } from "gsap/ScrollSmoother";
 
-import { Cursor } from "../Cursor.js";
 import { introBeats, introCopy } from "./beats.js";
 import { createLoom } from "./cloth.js";
 import {
@@ -67,9 +66,6 @@ document.getElementById("intro-choice-ai-hint").textContent =
   introCopy.choice.ai.hint;
 choiceReplay.textContent = introCopy.choice.replay;
 skipBtn.textContent = introCopy.skip;
-
-// Same ring the slideshow draws, and base.css already hides the native one.
-new Cursor(document.querySelector(".cursor"));
 
 const progress = createProgress({
   fill: document.getElementById("intro-progress-fill"),

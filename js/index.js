@@ -1,7 +1,6 @@
 import { Showcase } from "./Showcase";
 import { Slides } from "./Slides";
 import { Sheet } from "./Sheet";
-import { Cursor } from "./Cursor";
 import { Progress } from "./Progress";
 import tujia from "../images/岩墙花.jpg";
 import tujiaDepth from "../images/岩墙花-depth.png";
@@ -32,7 +31,6 @@ container.addEventListener("scroll", () => {
   container.scrollTop = 0;
   container.scrollLeft = 0;
 });
-const cursor = new Cursor(document.querySelector(".cursor"));
 const slidesData = [
   {
     image: tujia,
@@ -166,14 +164,12 @@ const showcase = new Showcase(slidesData, {
     slides.onMove(index);
   },
   onZoomOutStart: ({ activeIndex }) => {
-    cursor.enter();
     slides.appear();
     // Long press: pin the knob to the middle of the track.
     progress.setDragging(true);
   },
   onZoomOutFinish: ({ activeIndex }) => {},
   onFullscreenStart: ({ activeIndex }) => {
-    cursor.leave();
     slides.disperse(activeIndex);
     // Released: the knob animates back to the slide we landed on.
     progress.setDragging(false);

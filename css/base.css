@@ -232,51 +232,6 @@ body {
   font-family: covik-sans, sans-serif;
 }
 
-/* On fine-pointer devices only the self drawn ring is ever shown. This has to
-   be the heavy handed version: a plain `cursor: none` on the root loses to
-   every element that sets its own (base.css gives buttons and links
-   `cursor: pointer`, the glass pane uses grab/grabbing, the sheet body wants
-   a text cursor, ...). Touch devices undo this in the media query below. */
-html,
-body,
-* {
-  cursor: none !important;
-}
-
-.cursor {
-  display: block;
-}
-
-/* A ring that chases the last touch point is a mouse affordance, not a phone
-   one. Touch devices keep their native cursor and never paint the ring. */
-@media (hover: none), (pointer: coarse) {
-  html,
-  body,
-  * {
-    cursor: auto !important;
-  }
-
-  .cursor {
-    display: none;
-  }
-}
-
-.cursor__inner {
-  z-index: 9999;
-  pointer-events: none;
-  position: absolute;
-  top: 0;
-  left: 0;
-  mix-blend-mode: difference;
-  border-radius: 50%;
-}
-
-.cursor__inner--circle {
-  width: 40px;
-  height: 40px;
-  border: 1px solid #fff;
-}
-
 /* Page Loader */
 .js .loading::before {
   content: "";
