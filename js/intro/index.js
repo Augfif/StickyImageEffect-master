@@ -107,6 +107,7 @@ let splits = null;
 // drives is still locked.
 let scrollReady = false;
 let choiceVisible = false;
+let forkTimer = null;
 
 function setReachable(element, reachable) {
   element.tabIndex = reachable ? 0 : -1;
@@ -123,10 +124,24 @@ function revealChoice(visible) {
   setReachable(choiceReplay, visible);
 
   if (visible) {
-    loom.show(false);
+    // Let the last fabric stay behind the opening directory for a moment.
+    // Hiding the loom at the same time as the cards arrive is what made the
+    // hand-off feel like a hard cut.
+    loomEl.classList.add("is-forking");
+    window.clearTimeout(forkTimer);
+    forkTimer = window.setTimeout(
+      () => {
+        if (!choiceVisible) return;
+        loomEl.classList.remove("is-forking");
+        loom.show(false);
+      },
+      reducedMotion ? 0 : 900
+    );
     hint.classList.remove("is-visible");
     revealSkip(false);
   } else {
+    window.clearTimeout(forkTimer);
+    loomEl.classList.remove("is-forking");
     loom.show(true);
   }
 }

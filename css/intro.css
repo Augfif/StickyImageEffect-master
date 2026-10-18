@@ -41,7 +41,14 @@ html::-webkit-scrollbar {
   pointer-events: none;
   background:
     radial-gradient(circle at 50% 42%, #202029 0, #111116 48%, #08080b 100%);
-  transition: opacity 520ms cubic-bezier(0.2, 1, 0.3, 1);
+  transition: opacity 700ms cubic-bezier(0.2, 1, 0.3, 1),
+    transform 900ms cubic-bezier(0.2, 1, 0.3, 1);
+}
+
+/* The last pattern recedes instead of vanishing under the new screen. */
+.loom.is-forking {
+  opacity: 0.42;
+  transform: scale(1.012);
 }
 
 .loom.is-hidden {
@@ -453,9 +460,9 @@ html::-webkit-scrollbar {
   opacity: 0;
   visibility: hidden;
   pointer-events: none;
-  transition: opacity 550ms cubic-bezier(0.2, 1, 0.3, 1),
-    visibility 550ms,
-    clip-path 760ms cubic-bezier(0.2, 1, 0.3, 1);
+  transition: opacity 650ms cubic-bezier(0.2, 1, 0.3, 1),
+    visibility 650ms,
+    clip-path 900ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .loom-choice.is-visible {
@@ -482,6 +489,40 @@ html::-webkit-scrollbar {
 .loom-choice__panel {
   position: relative;
   width: min(1080px, 100%);
+}
+
+.loom-choice__kicker,
+.loom-choice__title,
+.loom-choice__cards,
+.loom-choice__replay {
+  opacity: 0;
+  transform: translateY(14px);
+  transition: opacity 520ms cubic-bezier(0.2, 1, 0.3, 1),
+    transform 620ms cubic-bezier(0.2, 1, 0.3, 1);
+}
+
+.loom-choice.is-visible .loom-choice__kicker,
+.loom-choice.is-visible .loom-choice__title,
+.loom-choice.is-visible .loom-choice__cards,
+.loom-choice.is-visible .loom-choice__replay {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.loom-choice.is-visible .loom-choice__kicker {
+  transition-delay: 120ms;
+}
+
+.loom-choice.is-visible .loom-choice__title {
+  transition-delay: 180ms;
+}
+
+.loom-choice.is-visible .loom-choice__cards {
+  transition-delay: 280ms;
+}
+
+.loom-choice.is-visible .loom-choice__replay {
+  transition-delay: 440ms;
 }
 
 .loom-choice__kicker {
@@ -841,5 +882,23 @@ body.is-choice .intro-skip {
   .loom__warp,
   .intro-hint svg {
     animation: none;
+  }
+
+  .loom,
+  .loom-choice {
+    transition-duration: 1ms;
+  }
+
+  .loom.is-forking {
+    transform: none;
+  }
+
+  .loom-choice__kicker,
+  .loom-choice__title,
+  .loom-choice__cards,
+  .loom-choice__replay {
+    opacity: 1;
+    transform: none;
+    transition: none;
   }
 }
