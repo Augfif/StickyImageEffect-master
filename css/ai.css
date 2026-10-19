@@ -23,37 +23,28 @@ body {
   overflow-x: hidden;
 }
 
-/* The textile itself: one macro shot of a 土家织锦, a dark veil and a hairline
-   weave grid, stacked as backgrounds. The veil is what keeps the copy readable;
-   the grid keeps a cloth grain on screens where the photograph is upscaled too
-   far to show its own warp and weft. Fixed, so it reads as the room the list
-   sits in rather than as something scrolling with it. */
+/* A seamless jacquard: black ground, gold diamond lattice, small woven florets.
+   It is tiled at its own size rather than scaled to cover, so the motif keeps
+   the scale it was drawn at on every screen — the page looks like a bolt of
+   cloth cut to the window, not like a photograph blown up behind it.
+   Fixed, so the cloth stays put while the list moves. */
 .ai__texture {
   position: fixed;
   inset: 0;
   z-index: 0;
   pointer-events: none;
   background-image:
-    repeating-linear-gradient(
-      90deg,
-      rgba(255, 255, 255, 0.022) 0 1px,
-      transparent 1px 4px
-    ),
-    repeating-linear-gradient(
-      0deg,
-      rgba(255, 255, 255, 0.018) 0 1px,
-      transparent 1px 4px
-    ),
     linear-gradient(
       180deg,
-      rgba(19, 19, 25, 0.78) 0%,
-      rgba(19, 19, 25, 0.84) 45%,
-      rgba(19, 19, 25, 0.9) 100%
+      rgba(8, 8, 10, 0.38) 0%,
+      rgba(8, 8, 10, 0.16) 45%,
+      rgba(8, 8, 10, 0.42) 100%
     ),
-    url("../images/opening/hook-texture.jpg");
-  background-size: auto, auto, auto, cover;
-  background-position: 0 0, 0 0, 0 0, 50% 38%;
-  background-repeat: repeat, repeat, no-repeat, no-repeat;
+    url("../images/ai/jacquard.jpg");
+  /* `auto` keeps the tile at 1254 x 1254 css pixels. */
+  background-size: auto, auto;
+  background-position: 0 0, 0 0;
+  background-repeat: no-repeat, repeat;
 }
 
 /* ---------------------------------------------------------------- header -- */
@@ -72,7 +63,7 @@ body {
 
 .ai__eyebrow {
   margin: 0;
-  font-size: 0.68rem;
+  font-size: 0.72rem;
   letter-spacing: 0.3em;
   /* Sits straight on the textile, so it needs a touch more ink than the copy
      that used to live on a flat colour. */
@@ -84,7 +75,7 @@ body {
   font-family: "Ma Shan Zheng", "华文行楷", "STXingkai", "方正舒体", "FZShuTi",
     "楷体", "KaiTi", "STKaiti", serif;
   font-weight: 400;
-  font-size: clamp(1.7rem, 3.2vw, 2.6rem);
+  font-size: clamp(1.8rem, 3.4vw, 2.8rem);
   line-height: 1.1;
   letter-spacing: 0.02em;
 }
@@ -158,7 +149,7 @@ body.pl-loading .pl {
   position: relative;
   flex: none;
   width: 2.2rem;
-  font-size: 0.66rem;
+  font-size: 0.7rem;
   letter-spacing: 0.16em;
   color: rgba(255, 255, 255, 0.26);
   font-variant-numeric: tabular-nums;
@@ -205,7 +196,7 @@ body.pl-loading .pl {
   font-family: "Ma Shan Zheng", "华文行楷", "STXingkai", "方正舒体", "FZShuTi",
     "楷体", "KaiTi", "STKaiti", serif;
   font-weight: 400;
-  font-size: clamp(1.45rem, 4.4vw, 3.6rem);
+  font-size: clamp(1.7rem, 5vw, 4.4rem);
   line-height: 1.18;
   letter-spacing: 0.02em;
   transition: color 300ms cubic-bezier(0.2, 1, 0.3, 1);
@@ -217,7 +208,7 @@ body.pl-loading .pl {
 
 .pl__meta {
   overflow: hidden;
-  font-size: clamp(0.76rem, 1.05vw, 0.82rem);
+  font-size: clamp(0.8rem, 1.1vw, 0.9rem);
   letter-spacing: 0.12em;
   white-space: nowrap;
   text-overflow: ellipsis;
