@@ -5,7 +5,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <title>造型生成 | 织造万象</title>
-  <meta name="description" content="用你手里的土家织锦，给人物、配饰和椅子统一换料。" />
+  <meta name="description" content="用你手里的土家织锦，给人物与配饰统一换料。" />
   <link rel="shortcut icon" href="favicon.ico" />
   <link rel="stylesheet" type="text/css" href="css/base.css" />
   <link rel="stylesheet" type="text/css" href="css/ai-style.css" />
@@ -36,29 +36,24 @@
     <div class="studio__panel">
       <div class="studio__copy" id="pattern-copy"></div>
 
-      <label class="studio__drop" id="drop">
-        <input class="studio__file" id="person-input" type="file" accept="image/*" />
-        <span class="studio__drop-inner" id="drop-inner">
-          <strong class="studio__drop-title" id="upload-title"></strong>
-          <span class="studio__drop-hint" id="upload-hint"></span>
-        </span>
-        <img class="studio__preview" id="preview" alt="" hidden />
-      </label>
+      <div class="studio__uploads">
+        <label class="studio__drop" id="accessory-drop">
+          <input class="studio__file" id="accessory-input" type="file" accept="image/*" />
+          <span class="studio__drop-inner">
+            <strong class="studio__drop-title" id="accessory-title"></strong>
+            <span class="studio__drop-hint" id="accessory-hint"></span>
+          </span>
+          <img class="studio__preview" id="accessory-preview" alt="" hidden />
+        </label>
 
-      <div class="studio__defaults">
-        <p class="studio__defaults-title" id="defaults-title"></p>
-        <figure class="studio__default">
-          <img id="accessory-shot" alt="" />
-          <figcaption>
-            <span id="accessory-label"></span> · <span id="default-note"></span>
-          </figcaption>
-        </figure>
-        <figure class="studio__default">
-          <img id="chair-shot" alt="" />
-          <figcaption>
-            <span id="chair-label"></span> · <span id="default-note-2"></span>
-          </figcaption>
-        </figure>
+        <label class="studio__drop" id="selfie-drop">
+          <input class="studio__file" id="selfie-input" type="file" accept="image/*" />
+          <span class="studio__drop-inner">
+            <strong class="studio__drop-title" id="selfie-title"></strong>
+            <span class="studio__drop-hint" id="selfie-hint"></span>
+          </span>
+          <img class="studio__preview" id="selfie-preview" alt="" hidden />
+        </label>
       </div>
 
       <p class="studio__error" id="error" role="alert"></p>

@@ -112,6 +112,12 @@ body {
   color: rgba(255, 255, 255, 0.72);
 }
 
+.studio__uploads {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+}
+
 .studio__drop {
   position: relative;
   display: flex;
@@ -119,8 +125,8 @@ body {
   align-items: center;
   justify-content: center;
   gap: 0.6rem;
-  min-height: 210px;
-  padding: 1.6rem;
+  min-height: 230px;
+  padding: 1.3rem;
   border: 1px dashed rgba(255, 255, 255, 0.26);
   border-radius: 14px;
   text-align: center;
@@ -163,8 +169,9 @@ body {
 }
 
 .studio__preview {
+  width: auto;
   max-width: 100%;
-  max-height: 320px;
+  max-height: 260px;
   border-radius: 10px;
   object-fit: contain;
 }
@@ -172,41 +179,6 @@ body {
 /* Once a picture is chosen the prompt steps aside so the preview has the room. */
 .studio__drop.has-file .studio__drop-inner {
   display: none;
-}
-
-.studio__defaults {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 0.9rem;
-}
-
-.studio__defaults-title {
-  width: 100%;
-  margin: 0;
-  font-size: 0.7rem;
-  letter-spacing: 0.3em;
-  color: rgba(255, 255, 255, 0.42);
-}
-
-.studio__default {
-  margin: 0;
-  width: 116px;
-}
-
-.studio__default img {
-  width: 100%;
-  aspect-ratio: 4 / 3;
-  object-fit: cover;
-  border-radius: 8px;
-  opacity: 0.72;
-}
-
-.studio__default figcaption {
-  margin-top: 0.4rem;
-  font-size: 0.68rem;
-  letter-spacing: 0.08em;
-  color: rgba(255, 255, 255, 0.45);
 }
 
 .studio__error {
@@ -369,5 +341,15 @@ body {
     top: 1.4rem;
     right: 1.2rem;
     color: rgba(255, 255, 255, 0.7);
+  }
+}
+
+@media (max-width: 640px) {
+  .studio__uploads {
+    grid-template-columns: 1fr;
+  }
+
+  .studio__drop {
+    min-height: 200px;
   }
 }

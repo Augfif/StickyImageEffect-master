@@ -39,7 +39,7 @@ npm run depth        # 同步 tujia/ → 缩放 → 生成深度图；--force �
 | 开场页 | [index.html](index.html) | `js/intro/index.js` | 电影感「走廊」自动播放 + 滚动推进十条内容 |
 | 主界面 | [main.html](main.html) | `js/index.js` | 可拖动切换的 sticky 视差幻灯片（五张照片） |
 | AI 纹样目录 | [ai.html](ai.html) | `js/ai/index.js` | 十幅纹样排成竖列表，悬停时浮动大图跟随指针；触屏设备保留行内缩略图，点击进入生成页 |
-| 造型生成 | [ai-style.html](ai-style.html) | `js/ai/style.js` | 上传人物照片 → 调 ai-drawing 生成 → 展示与下载结果 |
+| 造型生成 | [ai-style.html](ai-style.html) | `js/ai/style.js` | 上传配饰照片与自拍 → 调 ai-drawing 生成 → 展示与下载结果 |
 | — | [base.html](base.html) | — | 原始 Codrops 模板页，**不在 build 入口里，当前不可运行**，仅作历史参考 |
 
 导航只从开场页末尾发出去：那里并排两个按钮（「赏织锦」→ `main.html`，「AI 互动」→ `ai.html`），
@@ -63,8 +63,8 @@ three.js 贴图，换掉会让视差构图错位。没有图的纹样标 `pendin
 四个必填字段 `person`（人物）、`fabric`（布匹，唯一换料原料）、`accessory`、`chair`，
 成功直接返回图片二进制，失败返回 `{ error: { code, message } }`（400/413/415/422/500/502）。
 接口不收提示词，也不收「纹样 id」——选中的织锦是以 `fabric` 这个文件身份参与生成的。
-前端把用户上传的人像作为 `person`，把所选纹样的主图作为 `fabric`，配饰与椅子用
-`images/ai/accessory.png`、`images/ai/chair.png`（从后端 `images/` 复制，前端自包含）。
+前端把用户上传的自拍作为 `person`、配饰照片作为 `accessory`，把所选纹样的主图作为
+`fabric`；椅子仍用 `images/ai/chair.png` 作为不露出的兜底素材，保证旧后端契约可用。
 字段顺序必须与提示词里的「参考图1/2/3/4」一一对应，传反了语义就反了。
 
 开发与 `npm run preview` 都靠 `vite.config.js` 里的 `/api` → `127.0.0.1:8000` 代理，
@@ -84,7 +84,7 @@ css/
 fonts/                      # MaShanZheng 毛笔字体（自托管）
 images/                     # 页面真正引用的素材：原图 + 同名 -depth.png
 images/opening/             # 开场布匹用的织物扫描图（已裁边、压缩）
-images/ai/                  # 提花底纹、生成请求用的默认配饰与椅子
+images/ai/                  # 提花底纹与生成请求用的椅子兜底素材
 images/ai/source/           # 织物扫描原图，只用于重新生成 shots，不被页面加载
 images/ai/shots/            # AI 目录与生成页实际加载的压缩图（<slug>.jpg）
 tujia/                      # 原图投放目录，depth 工具从这里同步到 images/

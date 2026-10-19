@@ -1,6 +1,5 @@
 import { aiCopy } from "./copy.js";
 import { patternBySlug, shotsForPattern } from "./patterns.js";
-import accessoryUrl from "../../images/ai/accessory.png";
 import chairUrl from "../../images/ai/chair.png";
 
 const copy = aiCopy.studio;
@@ -54,18 +53,16 @@ const ui = {
   patternTitle: byId("pattern-title"),
   patternMeta: byId("pattern-meta"),
   patternCopy: byId("pattern-copy"),
-  drop: byId("drop"),
-  input: byId("person-input"),
-  uploadTitle: byId("upload-title"),
-  uploadHint: byId("upload-hint"),
-  preview: byId("preview"),
-  defaultsTitle: byId("defaults-title"),
-  accessoryShot: byId("accessory-shot"),
-  chairShot: byId("chair-shot"),
-  accessoryLabel: byId("accessory-label"),
-  chairLabel: byId("chair-label"),
-  defaultNote: byId("default-note"),
-  defaultNote2: byId("default-note-2"),
+  accessoryDrop: byId("accessory-drop"),
+  accessoryInput: byId("accessory-input"),
+  accessoryTitle: byId("accessory-title"),
+  accessoryHint: byId("accessory-hint"),
+  accessoryPreview: byId("accessory-preview"),
+  selfieDrop: byId("selfie-drop"),
+  selfieInput: byId("selfie-input"),
+  selfieTitle: byId("selfie-title"),
+  selfieHint: byId("selfie-hint"),
+  selfiePreview: byId("selfie-preview"),
   error: byId("error"),
   submit: byId("submit"),
   waitingTitle: byId("waiting-title"),
@@ -82,13 +79,26 @@ const ui = {
 };
 
 const state = {
-  file: null,
-  previewUrl: null,
+  files: { accessory: null, selfie: null },
+  previewUrls: { accessory: null, selfie: null },
   resultUrl: null,
   controller: null,
   clockId: null,
   startedAt: 0,
   busy: false
+};
+
+const uploads = {
+  accessory: {
+    drop: ui.accessoryDrop,
+    input: ui.accessoryInput,
+    preview: ui.accessoryPreview
+  },
+  selfie: {
+    drop: ui.selfieDrop,
+    input: ui.selfieInput,
+    preview: ui.selfiePreview
+  }
 };
 
 // --- static copy -----------------------------------------------------------
@@ -98,13 +108,10 @@ ui.invalidTitle.textContent = copy.invalidTitle;
 ui.invalidBody.textContent = copy.invalidBody;
 ui.invalidAction.textContent = copy.invalidAction;
 ui.patternEyebrow.textContent = copy.eyebrow;
-ui.uploadTitle.textContent = copy.uploadTitle;
-ui.uploadHint.textContent = copy.uploadHint;
-ui.defaultsTitle.textContent = copy.defaultsTitle;
-ui.accessoryLabel.textContent = copy.accessory;
-ui.chairLabel.textContent = copy.chair;
-ui.defaultNote.textContent = copy.defaultNote;
-ui.defaultNote2.textContent = copy.defaultNote;
+ui.accessoryTitle.textContent = copy.accessoryUploadTitle;
+ui.accessoryHint.textContent = copy.accessoryUploadHint;
+ui.selfieTitle.textContent = copy.selfieUploadTitle;
+ui.selfieHint.textContent = copy.selfieUploadHint;
 ui.waitingTitle.textContent = copy.waitingTitle;
 ui.waitingHint.textContent = copy.waitingHint;
 ui.cancel.textContent = copy.cancel;
@@ -148,8 +155,6 @@ if (!pattern || pattern.pending || shots.length === 0) {
   ui.patternShot.alt = pattern.title;
   ui.patternTitle.textContent = pattern.title;
   ui.patternMeta.textContent = pattern.meta || "";
-  ui.accessoryShot.src = accessoryUrl;
-  ui.chairShot.src = chairUrl;
   show("form");
 }
 
@@ -166,70 +171,82 @@ function checkFile(file) {
   return copy.errorType;
 }
 
-function clearFile() {
-  state.file = null;
-  if (state.previewUrl) {
-    URL.revokeObjectURL(state.previewUrl);
-    state.previewUrl = null;
-  }
-  ui.preview.hidden = true;
-  ui.preview.removeAttribute("src");
-  ui.drop.classList.remove("has-file");
-  ui.input.value = "";
-  ui.submit.disabled = true;
-  ui.submit.textContent = copy.submitDisabled;
+function updateSubmit() {
+  const ready = Boolean(state.files.accessory && state.files.selfie);
+  ui.submit.disabled = !ready;
+  ui.submit.textContent = ready ? copy.submit : copy.submitDisabled;
 }
 
-function acceptFile(file) {
+function clearUpload(key) {
+  const field = uploads[key];
+  state.files[key] = null;
+  if (state.previewUrls[key]) {
+    URL.revokeObjectURL(state.previewUrls[key]);
+    state.previewUrls[key] = null;
+  }
+  field.preview.hidden = true;
+  field.preview.removeAttribute("src");
+  field.drop.classList.remove("has-file");
+  field.input.value = "";
+  updateSubmit();
+}
+
+function clearUploads() {
+  Object.keys(uploads).forEach(clearUpload);
+}
+
+function acceptFile(key, file) {
   const problem = checkFile(file);
   if (problem) {
     setError(problem);
-    clearFile();
+    clearUpload(key);
     return;
   }
+
+  const field = uploads[key];
   setError("");
-  state.file = file;
-  if (state.previewUrl) URL.revokeObjectURL(state.previewUrl);
-  state.previewUrl = URL.createObjectURL(file);
-  ui.preview.src = state.previewUrl;
-  ui.preview.hidden = false;
-  ui.drop.classList.add("has-file");
-  ui.submit.disabled = false;
-  ui.submit.textContent = copy.submit;
+  state.files[key] = file;
+  if (state.previewUrls[key]) URL.revokeObjectURL(state.previewUrls[key]);
+  state.previewUrls[key] = URL.createObjectURL(file);
+  field.preview.src = state.previewUrls[key];
+  field.preview.hidden = false;
+  field.drop.classList.add("has-file");
+  updateSubmit();
 }
 
-ui.input.addEventListener("change", () => {
-  const file = ui.input.files && ui.input.files[0];
-  if (file) {
-    acceptFile(file);
+Object.entries(uploads).forEach(([key, field]) => {
+  field.input.addEventListener("change", () => {
+    const file = field.input.files && field.input.files[0];
+    if (!file) return;
+    acceptFile(key, file);
     // Lets the same file be picked again after a rejected attempt.
-    ui.input.value = "";
-  }
-});
-
-["dragenter", "dragover"].forEach(name => {
-  ui.drop.addEventListener(name, event => {
-    event.preventDefault();
-    ui.drop.classList.add("is-dragging");
+    field.input.value = "";
   });
-});
 
-["dragleave", "dragend"].forEach(name => {
-  ui.drop.addEventListener(name, () => ui.drop.classList.remove("is-dragging"));
-});
+  ["dragenter", "dragover"].forEach(name => {
+    field.drop.addEventListener(name, event => {
+      event.preventDefault();
+      field.drop.classList.add("is-dragging");
+    });
+  });
 
-ui.drop.addEventListener("drop", event => {
-  event.preventDefault();
-  ui.drop.classList.remove("is-dragging");
-  const file = event.dataTransfer && event.dataTransfer.files[0];
-  if (file) acceptFile(file);
+  ["dragleave", "dragend"].forEach(name => {
+    field.drop.addEventListener(name, () => field.drop.classList.remove("is-dragging"));
+  });
+
+  field.drop.addEventListener("drop", event => {
+    event.preventDefault();
+    field.drop.classList.remove("is-dragging");
+    const file = event.dataTransfer && event.dataTransfer.files[0];
+    if (file) acceptFile(key, file);
+  });
 });
 
 // Dropping anywhere else must not navigate away from the page.
 window.addEventListener("dragover", event => event.preventDefault());
 window.addEventListener("drop", event => event.preventDefault());
 
-// --- the three pictures the browser supplies -------------------------------
+// --- the pictures the browser supplies --------------------------------------
 
 async function fetchBlob(url) {
   const response = await fetch(url);
@@ -237,19 +254,15 @@ async function fetchBlob(url) {
   return response.blob();
 }
 
-// The backend takes four references: 人物、布匹、配饰、椅子. The fabric is the
-// selected pattern's main shot and the other two are bundled defaults, so only
-// the person comes from the visitor.
+// The backend takes four references: 人物、布匹、配饰、椅子. The selected
+// pattern supplies the fabric, the two uploads supply person and accessory,
+// and the chair stays a bundled default so the existing contract keeps working.
 let presetsPromise = null;
 
 function loadPresets() {
   if (!presetsPromise) {
-    presetsPromise = Promise.all([
-      fetchBlob(shots[0]),
-      fetchBlob(accessoryUrl),
-      fetchBlob(chairUrl)
-    ])
-      .then(([fabric, accessory, chair]) => ({ fabric, accessory, chair }))
+    presetsPromise = Promise.all([fetchBlob(shots[0]), fetchBlob(chairUrl)])
+      .then(([fabric, chair]) => ({ fabric, chair }))
       .catch(error => {
         presetsPromise = null;
         throw error;
@@ -317,7 +330,7 @@ function showResult(blob, contentType) {
 }
 
 async function generate() {
-  if (!state.file || state.busy) return;
+  if (!state.files.accessory || !state.files.selfie || state.busy) return;
 
   state.busy = true;
   setError("");
@@ -330,9 +343,9 @@ async function generate() {
   try {
     const presets = await loadPresets();
     const body = new FormData();
-    body.append("person", state.file, state.file.name);
+    body.append("person", state.files.selfie, state.files.selfie.name);
     body.append("fabric", presets.fabric, `${pattern.title}.jpg`);
-    body.append("accessory", presets.accessory, "accessory.png");
+    body.append("accessory", state.files.accessory, state.files.accessory.name);
     body.append("chair", presets.chair, "chair.png");
 
     const response = await fetch(ENDPOINT, {
@@ -371,7 +384,7 @@ ui.retry.addEventListener("click", () => {
     URL.revokeObjectURL(state.resultUrl);
     state.resultUrl = null;
   }
-  clearFile();
+  clearUploads();
   setError("");
   show("form");
 });
