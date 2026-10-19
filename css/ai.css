@@ -23,9 +23,44 @@ body {
   overflow-x: hidden;
 }
 
+/* The textile itself: one macro shot of a 土家织锦, a dark veil and a hairline
+   weave grid, stacked as backgrounds. The veil is what keeps the copy readable;
+   the grid keeps a cloth grain on screens where the photograph is upscaled too
+   far to show its own warp and weft. Fixed, so it reads as the room the list
+   sits in rather than as something scrolling with it. */
+.ai__texture {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background-image:
+    repeating-linear-gradient(
+      90deg,
+      rgba(255, 255, 255, 0.022) 0 1px,
+      transparent 1px 4px
+    ),
+    repeating-linear-gradient(
+      0deg,
+      rgba(255, 255, 255, 0.018) 0 1px,
+      transparent 1px 4px
+    ),
+    linear-gradient(
+      180deg,
+      rgba(19, 19, 25, 0.78) 0%,
+      rgba(19, 19, 25, 0.84) 45%,
+      rgba(19, 19, 25, 0.9) 100%
+    ),
+    url("../images/opening/hook-texture.jpg");
+  background-size: auto, auto, auto, cover;
+  background-position: 0 0, 0 0, 0 0, 50% 38%;
+  background-repeat: repeat, repeat, no-repeat, no-repeat;
+}
+
 /* ---------------------------------------------------------------- header -- */
 
 .ai__header {
+  position: relative;
+  z-index: 1;
   display: flex;
   align-items: flex-end;
   justify-content: space-between;
@@ -33,14 +68,15 @@ body {
   width: min(100% - var(--pl-gutter) * 2, 1180px);
   margin: 0 auto;
   padding: 7vh 0 1.5rem;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .ai__eyebrow {
   margin: 0;
   font-size: 0.68rem;
   letter-spacing: 0.3em;
-  color: rgba(255, 255, 255, 0.4);
+  /* Sits straight on the textile, so it needs a touch more ink than the copy
+     that used to live on a flat colour. */
+  color: rgba(255, 255, 255, 0.52);
 }
 
 .ai__title {
@@ -62,7 +98,7 @@ body {
   letter-spacing: 0.28em;
   text-indent: 0.28em;
   white-space: nowrap;
-  color: rgba(255, 255, 255, 0.42);
+  color: rgba(255, 255, 255, 0.5);
   transition: color 300ms cubic-bezier(0.2, 1, 0.3, 1);
 }
 
@@ -74,6 +110,8 @@ body {
 /* ------------------------------------------------------------------ list -- */
 
 .pl {
+  position: relative;
+  z-index: 1;
   width: min(100% - var(--pl-gutter) * 2, 1180px);
   margin: 0 auto;
   padding: 0 0 calc(10vh + env(safe-area-inset-bottom, 0px));
@@ -91,7 +129,6 @@ body.pl-loading .pl {
   /* A stacking context per row keeps the reveal (z-index: -1) above the page
      background and below the row's own text. */
   z-index: 1;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.07);
 }
 
 .pl__item {
@@ -115,12 +152,29 @@ body.pl-loading .pl {
 }
 
 .pl__index {
+  /* A column of numbers at rest is what made the list read as a table, so on
+     touch it is simply gone; a hovering pointer gets it as a reveal. */
+  display: none;
+  position: relative;
   flex: none;
   width: 2.2rem;
   font-size: 0.66rem;
   letter-spacing: 0.16em;
   color: rgba(255, 255, 255, 0.26);
   font-variant-numeric: tabular-nums;
+}
+
+.pl__index::before {
+  content: "";
+  position: absolute;
+  left: -0.55rem;
+  top: 50%;
+  width: 2px;
+  height: 1.05em;
+  background: currentColor;
+  transform: translateY(-50%) scaleY(0);
+  transform-origin: center bottom;
+  transition: transform 300ms cubic-bezier(0.2, 1, 0.3, 1);
 }
 
 /* 60 x 80 keeps the 3:4 of the majority of the shots; the four landscape ones
@@ -151,7 +205,7 @@ body.pl-loading .pl {
   font-family: "Ma Shan Zheng", "华文行楷", "STXingkai", "方正舒体", "FZShuTi",
     "楷体", "KaiTi", "STKaiti", serif;
   font-weight: 400;
-  font-size: clamp(1.45rem, 3.6vw, 2.9rem);
+  font-size: clamp(1.45rem, 4.4vw, 3.6rem);
   line-height: 1.18;
   letter-spacing: 0.02em;
   transition: color 300ms cubic-bezier(0.2, 1, 0.3, 1);
@@ -180,8 +234,8 @@ body.pl-loading .pl {
 
 .pl__item:hover .pl__meta,
 .pl__item:focus-visible .pl__meta {
-  color: rgba(255, 255, 255, 0.68);
-  text-shadow: 0 1px 12px rgba(0, 0, 0, 0.85);
+  color: rgba(255, 255, 255, 0.8);
+  text-shadow: 0 1px 8px rgba(0, 0, 0, 0.9);
 }
 
 .pl__arrow {
@@ -253,6 +307,78 @@ body.pl-loading .pl {
   .pl__thumb {
     display: none;
   }
+
+  /* At rest: title only. Everything that used to make each row a table cell
+     (the number, the rule, the subtitle, the arrow) arrives with the pointer. */
+  .pl__index {
+    display: block;
+    opacity: 0;
+    transform: translateX(-0.8rem);
+    transition: opacity 300ms cubic-bezier(0.2, 1, 0.3, 1),
+      transform 300ms cubic-bezier(0.2, 1, 0.3, 1);
+  }
+
+  .pl__item:hover .pl__index,
+  .pl__item:focus-visible .pl__index {
+    opacity: 1;
+    transform: translateX(0);
+  }
+
+  .pl__item:hover .pl__index::before,
+  .pl__item:focus-visible .pl__index::before {
+    transform: translateY(-50%) scaleY(1);
+  }
+
+  .pl__arrow {
+    opacity: 0;
+  }
+
+  .pl__item:hover .pl__arrow,
+  .pl__item:focus-visible .pl__arrow {
+    opacity: 0.7;
+  }
+
+  /* The subtitle sits on the title's baseline and slides out from behind it,
+     with a hairline that grows the way the reference's does. It keeps its box
+     while hidden, so nothing reflows when the pointer arrives. */
+  .pl__text {
+    flex-direction: row;
+    align-items: baseline;
+    gap: 1.8rem;
+  }
+
+  .pl__meta {
+    position: relative;
+    padding-left: 1.6rem;
+    opacity: 0;
+    transform: translateX(-0.9rem);
+    transition: opacity 300ms cubic-bezier(0.2, 1, 0.3, 1),
+      transform 300ms cubic-bezier(0.2, 1, 0.3, 1);
+  }
+
+  .pl__meta::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 50%;
+    width: 1px;
+    height: 1.5em;
+    background: currentColor;
+    opacity: 0.6;
+    transform: translateY(-50%) rotate(22.5deg) scaleY(0);
+    transition: transform 300ms cubic-bezier(0.2, 1, 0.3, 1);
+  }
+
+  .pl__item:hover .pl__meta,
+  .pl__item:focus-visible .pl__meta {
+    opacity: 1;
+    transform: translateX(0);
+  }
+
+  .pl__item:hover .pl__meta::before,
+  .pl__item:focus-visible .pl__meta::before {
+    transform: translateY(-50%) rotate(22.5deg) scaleY(1);
+  }
 }
 
 @media (max-width: 899px) {
@@ -269,5 +395,17 @@ body.pl-loading .pl {
   .pl__index {
     width: 1.7rem;
     font-size: 0.62rem;
+  }
+}
+
+/* The hover choreography is a state change, not decoration, so it stays — it
+   just lands at once instead of sliding. */
+@media (prefers-reduced-motion: reduce) {
+  .pl__index,
+  .pl__index::before,
+  .pl__meta,
+  .pl__meta::before,
+  .pl__arrow {
+    transition-duration: 1ms;
   }
 }
