@@ -43,7 +43,9 @@ export const patterns = [
   // 对照，命名仍待确认；meta 也只是画面描述，不是考据出来的寓意。
   { slug: "sishibagou", title: "四十八勾", meta: "勾纹相扣绵延不断" },
   { slug: "shanxinghua", title: "山兴花", meta: "山形兴旺万物生" },
-  { slug: "babajia", title: "粑粑架", meta: "五谷丰登仓廪充盈" }
+  { slug: "babajia", title: "粑粑架", meta: "五谷丰登仓廪充盈" },
+  { slug: "wanzigechuanghua", title: "万字格窗花", meta: "万字窗格福常驻" },
+  { slug: "laoshujianv", title: "老鼠嫁女", meta: "鼠嫁喜临婚姻美" }
 ];
 
 export function patternBySlug(slug) {

@@ -1,7 +1,9 @@
 /** Every string the AI pages show, so wording changes never touch logic. */
 export const aiCopy = {
   grid: {
-    back: "返回"
+    back: "返回",
+    eyebrow: "织造万象 · 纹样目录",
+    title: "选一块织锦"
   },
   studio: {
     back: "返回网格",

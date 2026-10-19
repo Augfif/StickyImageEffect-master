@@ -1,56 +1,91 @@
+import { gsap } from "gsap";
 import { aiCopy } from "./copy.js";
 import { patterns, shotsForPattern } from "./patterns.js";
-import { createGridPreview, preloadImages } from "./grid-preview.js";
+import { createPatternMenu, preloadImages } from "./menu.js";
 
-const root = document.getElementById("grid");
+const list = document.getElementById("list");
+
 document.getElementById("ai-back").textContent = aiCopy.grid.back;
+document.getElementById("ai-eyebrow").textContent = aiCopy.grid.eyebrow;
+document.getElementById("ai-title").textContent = aiCopy.grid.title;
 
-const list = document.createElement("ul");
-list.className = "gp__grid";
-
-const tiles = patterns.map((pattern, index) => {
-  const tile = document.createElement("li");
-  tile.className = "gp__tile";
-  tile.dataset.index = String(index);
-  tile.dataset.title = pattern.title;
-  tile.dataset.meta = pattern.meta || "";
-
+// The pattern list, the picture file names and the links all come from
+// patterns.js, so adding a pattern is a one line change there.
+const rows = patterns.map((pattern, index) => {
   const shots = shotsForPattern(pattern);
+  const row = document.createElement("li");
+  row.className = "pl__row";
+
   if (!shots.length) {
-    tile.classList.add("gp__tile--pending");
-    tile.textContent = "待补";
-    return tile;
+    row.classList.add("pl__row--pending");
+    row.textContent = "待补";
+    return row;
   }
 
   const link = document.createElement("a");
-  link.className = "gp__tile-link";
+  link.className = "pl__item";
   link.href = `ai-style.html?pattern=${encodeURIComponent(pattern.slug)}`;
   link.setAttribute("aria-label", `${pattern.title}：进入造型生成`);
-  tile.append(link);
+  // Read by js/ai/menu.js to build the hover reveal.
+  link.dataset.image = shots[0];
 
-  const picture = document.createElement("img");
-  picture.src = shots[0];
-  picture.alt = pattern.title;
-  link.append(picture);
+  const number = document.createElement("span");
+  number.className = "pl__index";
+  number.textContent = String(index + 1).padStart(2, "0");
+  number.setAttribute("aria-hidden", "true");
 
-  // The extra angles never render in the tile; createGridPreview() copies their
-  // src into the pane, where they cross fade while the tile is hovered.
-  shots.slice(1).forEach(src => {
-    const detail = document.createElement("img");
-    detail.src = src;
-    detail.alt = "";
-    detail.dataset.detail = "";
-    link.append(detail);
-  });
+  // Only shown where the hover reveal cannot exist, i.e. touch devices.
+  const thumb = document.createElement("img");
+  thumb.className = "pl__thumb";
+  thumb.src = shots[0];
+  thumb.alt = "";
+  thumb.width = 54;
+  thumb.height = 72;
+  thumb.decoding = "async";
 
-  return tile;
+  const text = document.createElement("span");
+  text.className = "pl__text";
+
+  // The mask is what lets the title rise out of nothing on first paint.
+  const title = document.createElement("span");
+  title.className = "pl__title";
+  const titleInner = document.createElement("span");
+  titleInner.className = "pl__title-inner";
+  titleInner.textContent = pattern.title;
+  title.append(titleInner);
+
+  const meta = document.createElement("span");
+  meta.className = "pl__meta";
+  meta.textContent = pattern.meta || "";
+
+  text.append(title, meta);
+
+  const arrow = document.createElement("span");
+  arrow.className = "pl__arrow";
+  arrow.setAttribute("aria-hidden", "true");
+
+  link.append(number, thumb, text, arrow);
+  row.append(link);
+  return row;
 });
 
-list.append(...tiles);
-root.append(list);
+list.append(...rows);
 
-createGridPreview(root);
+createPatternMenu(list);
 
-preloadImages(root.querySelectorAll("img")).then(() => {
-  document.body.classList.remove("gp-loading");
+const titles = list.querySelectorAll(".pl__title-inner");
+if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+  gsap.set(titles, { yPercent: 0 });
+} else {
+  gsap.fromTo(
+    titles,
+    { yPercent: 110 },
+    { yPercent: 0, duration: 1.1, ease: "expo.out", stagger: 0.05, delay: 0.12 }
+  );
+}
+
+// Until the pictures are decoded a hover could reveal an empty box, so the
+// list starts hidden (body.pl-loading) and lifts once everything is ready.
+preloadImages(list.querySelectorAll("img")).then(() => {
+  document.body.classList.remove("pl-loading");
 });
