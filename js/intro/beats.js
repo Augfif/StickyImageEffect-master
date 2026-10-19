@@ -82,7 +82,7 @@ export const introBeats = [
 
 export const introCopy = {
   title: "织造万象",
-  subtitle: "——土家织锦服饰数字展与沉浸式 AI 交互体验",
+  subtitle: "土家织锦服饰数字展与沉浸式 AI 交互体验",
   // The two fabric cards at the end of the scroll. Keep each hint short
   // enough to sit on one line.
   choice: {
