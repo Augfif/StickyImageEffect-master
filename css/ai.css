@@ -36,15 +36,23 @@ body {
   background-image:
     linear-gradient(
       180deg,
-      rgba(8, 8, 10, 0.38) 0%,
-      rgba(8, 8, 10, 0.16) 45%,
-      rgba(8, 8, 10, 0.42) 100%
+      rgba(8, 8, 10, 0.62) 0%,
+      rgba(8, 8, 10, 0.54) 45%,
+      rgba(8, 8, 10, 0.66) 100%
     ),
     url("../images/ai/jacquard.jpg");
   /* `auto` keeps the tile at 1254 x 1254 css pixels. */
   background-size: auto, auto;
   background-position: 0 0, 0 0;
   background-repeat: no-repeat, repeat;
+  transition: opacity 420ms cubic-bezier(0.2, 1, 0.3, 1);
+}
+
+/* While a row is live the cloth steps back: the type and the picture are what
+   the reader is looking at, and the weave only needs to hold the room. */
+.ai:has(.pl__item:hover) .ai__texture,
+.ai:has(.pl__item:focus-visible) .ai__texture {
+  opacity: 0.45;
 }
 
 /* ---------------------------------------------------------------- header -- */
@@ -193,12 +201,15 @@ body.pl-loading .pl {
 .pl__title {
   display: block;
   overflow: hidden;
-  font-family: "Ma Shan Zheng", "华文行楷", "STXingkai", "方正舒体", "FZShuTi",
-    "楷体", "KaiTi", "STKaiti", serif;
-  font-weight: 400;
+  /* A light Song face for the list; the page title keeps the brush. Noto Serif
+     SC is Source Han Serif, so the first three names are the same design under
+     its three shipping names, and the rest are the system Song faces. */
+  font-family: "Noto Serif SC", "Source Han Serif SC", "Source Han Serif CN",
+    "Songti SC", "STSong", "SimSun", "宋体", serif;
+  font-weight: 300;
   font-size: clamp(1.7rem, 5vw, 4.4rem);
-  line-height: 1.18;
-  letter-spacing: 0.02em;
+  line-height: 1.25;
+  letter-spacing: 0.06em;
   transition: color 300ms cubic-bezier(0.2, 1, 0.3, 1);
 }
 
@@ -217,7 +228,9 @@ body.pl-loading .pl {
 
 .pl__item:hover .pl__title,
 .pl__item:focus-visible .pl__title {
-  color: #b78a84;
+  /* Warm copper, picked from the jacquard's own gold so the highlight belongs
+     to the cloth instead of sitting on top of it. */
+  color: #d4ac6e;
   /* The reveal can sit directly behind the title, so the copy needs to hold
      its own against a photograph. */
   text-shadow: 0 2px 18px rgba(0, 0, 0, 0.7);
