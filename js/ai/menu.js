@@ -11,17 +11,18 @@ import { gsap } from "gsap";
  *
  * How it works:
  *   - each row owns a hidden `.pl__reveal` box with its own picture;
- *   - entering slides the picture in from the side the pointer came from
- *     (two layers moving in opposite directions under an overflow mask);
+ *   - entering fades the picture in while the previous row fades out, so the
+ *     swap reads as one continuous image rather than a hard cut;
  *   - while the pointer stays, a rAF loop eases the box towards the cursor and
  *     adds rotation / brightness from the pointer's speed;
- *   - leaving slides it back out the same way.
+ *   - leaving fades it back out.
  */
 
-// Tuning. The reference uses 0.2s / ±60° / brightness 4; the dark room here
-// wants a quieter version of the same gesture, so the two extremes come down.
-const WIPE_DURATION = 0.2;
-const WIPE_EASE = "sine.out";
+// Tuning. The reference uses a 0.2s side wipe; here the picture fades instead,
+// matched to the copy's 260–320ms hover rhythm.
+const FADE_IN = 0.3;
+const FADE_OUT = 0.22;
+const FADE_EASE = "power2.out";
 const FOLLOW = 0.08; // fraction of the remaining distance closed per frame
 const SPEED_MAX = 100; // px per frame that counts as "full speed"
 const ROTATION_MAX = 25; // degrees
@@ -38,28 +39,20 @@ const prefersReducedMotion = () =>
 
 /**
  * The pointer position is shared by every row: only one row is ever told to
- * follow it, and keeping a single cache is what makes the wipe direction stay
- * consistent when the pointer slides from one row straight into the next.
+ * follow it, and keeping a single cache lets the picture pick up the pointer's
+ * speed as it moves from one row to the next.
  */
 const pointer = { x: 0, y: 0 };
 let pointerDelta = 0; // consumed once per frame, so a resting pointer calms down
-let lastPointerX = 0;
-let direction = 1; // +1: entering from the right, -1: from the left
-let directionKnown = false;
+let lastPointerX = null;
 
 window.addEventListener(
   "pointermove",
   event => {
     pointer.x = event.clientX;
     pointer.y = event.clientY;
-    if (directionKnown) {
-      pointerDelta += lastPointerX - event.clientX;
-      if (event.clientX !== lastPointerX) {
-        direction = event.clientX > lastPointerX ? 1 : -1;
-      }
-    }
+    if (lastPointerX !== null) pointerDelta += lastPointerX - event.clientX;
     lastPointerX = event.clientX;
-    directionKnown = true;
   },
   { passive: true }
 );
@@ -190,36 +183,16 @@ class MenuRow {
     this.y = this.targetY;
     this.rotation = 0;
     this.brightness = 1;
+    pointerDelta = 0;
     this.applyPose();
-    this.reveal.style.opacity = "1";
+    gsap.set(this.reveal, { opacity: 0 });
+    this.tween = gsap.to(this.reveal, {
+      opacity: 1,
+      duration: this.staticPose ? REDUCED_FADE : FADE_IN,
+      ease: FADE_EASE
+    });
 
-    if (this.staticPose) {
-      this.tween = gsap.fromTo(
-        this.reveal,
-        { opacity: 0 },
-        { opacity: 1, duration: REDUCED_FADE, ease: WIPE_EASE }
-      );
-      return;
-    }
-
-    // The two layers travel in opposite directions inside a hidden-overflow
-    // mask, which reads as the picture being wiped in rather than sliding.
-    this.tween = gsap
-      .timeline()
-      .fromTo(
-        this.inner,
-        { xPercent: direction * 100 },
-        { xPercent: 0, duration: WIPE_DURATION, ease: WIPE_EASE },
-        0
-      )
-      .fromTo(
-        this.image,
-        { xPercent: -direction * 100 },
-        { xPercent: 0, duration: WIPE_DURATION, ease: WIPE_EASE },
-        0
-      );
-
-    this.loop();
+    if (!this.staticPose) this.loop();
   }
 
   hide() {
@@ -238,28 +211,12 @@ class MenuRow {
       this.reveal.style.display = "none";
     };
 
-    if (this.staticPose) {
-      this.tween = gsap.to(this.reveal, {
-        opacity: 0,
-        duration: REDUCED_FADE,
-        ease: WIPE_EASE,
-        onComplete: settle
-      });
-      return;
-    }
-
-    this.tween = gsap
-      .timeline({ onComplete: settle })
-      .to(
-        this.inner,
-        { xPercent: -direction * 100, duration: WIPE_DURATION, ease: WIPE_EASE },
-        0
-      )
-      .to(
-        this.image,
-        { xPercent: direction * 100, duration: WIPE_DURATION, ease: WIPE_EASE },
-        0
-      );
+    this.tween = gsap.to(this.reveal, {
+      opacity: 0,
+      duration: this.staticPose ? REDUCED_FADE : FADE_OUT,
+      ease: "power1.out",
+      onComplete: settle
+    });
   }
 
   loop() {

@@ -210,7 +210,9 @@ body.pl-loading .pl {
   font-size: clamp(1.7rem, 5vw, 4.4rem);
   line-height: 1.25;
   letter-spacing: 0.06em;
-  transition: color 300ms cubic-bezier(0.2, 1, 0.3, 1);
+  transform-origin: left bottom;
+  transition: color 260ms cubic-bezier(0.22, 1, 0.36, 1),
+    transform 260ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .pl__title-inner {
@@ -224,13 +226,16 @@ body.pl-loading .pl {
   white-space: nowrap;
   text-overflow: ellipsis;
   color: rgba(255, 255, 255, 0.4);
+  transition: opacity 300ms cubic-bezier(0.22, 1, 0.36, 1),
+    transform 320ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .pl__item:hover .pl__title,
 .pl__item:focus-visible .pl__title {
-  /* Warm copper, picked from the jacquard's own gold so the highlight belongs
-     to the cloth instead of sitting on top of it. */
-  color: #d4ac6e;
+  /* A muted dark gold, picked from the jacquard's own thread so the highlight
+     belongs to the cloth instead of sitting on top of it. */
+  color: #c29a5b;
+  transform: scale(1.04);
   /* The reveal can sit directly behind the title, so the copy needs to hold
      its own against a photograph. */
   text-shadow: 0 2px 18px rgba(0, 0, 0, 0.7);
@@ -238,8 +243,14 @@ body.pl-loading .pl {
 
 .pl__item:hover .pl__meta,
 .pl__item:focus-visible .pl__meta {
-  color: rgba(255, 255, 255, 0.8);
-  text-shadow: 0 1px 8px rgba(0, 0, 0, 0.9);
+  opacity: 1;
+  transform: translateY(0);
+  color: #f5e9d4;
+  font-weight: 400;
+  /* The reveal can pass behind the subtitle; a tight shadow keeps it legible
+     over the brightest parts of the textile. */
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.95),
+    0 2px 14px rgba(0, 0, 0, 0.95), 0 0 24px rgba(0, 0, 0, 0.8);
 }
 
 .pl__arrow {
@@ -283,11 +294,10 @@ body.pl-loading .pl {
   height: calc(clamp(180px, 16vw, 240px) * 4 / 3);
   opacity: 0;
   pointer-events: none;
-  will-change: transform, filter;
+  will-change: transform, opacity, filter;
 }
 
-/* The mask the two layers slide inside; the wipe only reads as a wipe because
-   the picture itself travels the other way underneath it. */
+/* The mask keeps the rounded corners while the picture fades in and out. */
 .pl__reveal-inner {
   width: 100%;
   height: 100%;
@@ -355,9 +365,7 @@ body.pl-loading .pl {
     position: relative;
     padding-left: 1.6rem;
     opacity: 0;
-    transform: translateX(-0.9rem);
-    transition: opacity 300ms cubic-bezier(0.2, 1, 0.3, 1),
-      transform 300ms cubic-bezier(0.2, 1, 0.3, 1);
+    transform: translateY(5px);
   }
 
   .pl__meta::before {
@@ -371,12 +379,6 @@ body.pl-loading .pl {
     opacity: 0.6;
     transform: translateY(-50%) rotate(22.5deg) scaleY(0);
     transition: transform 300ms cubic-bezier(0.2, 1, 0.3, 1);
-  }
-
-  .pl__item:hover .pl__meta,
-  .pl__item:focus-visible .pl__meta {
-    opacity: 1;
-    transform: translateX(0);
   }
 
   .pl__item:hover .pl__meta::before,
@@ -410,6 +412,10 @@ body.pl-loading .pl {
   .pl__meta,
   .pl__meta::before,
   .pl__arrow {
+    transition-duration: 1ms;
+  }
+
+  .pl__title {
     transition-duration: 1ms;
   }
 }
