@@ -6,10 +6,10 @@ export const aiCopy = {
     title: "选一块织锦"
   },
   studio: {
-    back: "返回网格",
+    back: "返回目录",
     eyebrow: "当前纹样",
     invalidTitle: "还没有选择纹样",
-    invalidBody: "请先回到互动网格，悬停并点击一幅织锦，再回到这里生成造型。",
+    invalidBody: "请先回到纹样目录，悬停并点击一块织锦，再回到这里生成造型。",
     invalidAction: "去看织锦",
     intro: [
       "这一页会把你选中的这块织锦，完整换到人物的服装、配饰和椅子上——不是把图案叠上去，而是拆掉原来的面料重新包覆。",

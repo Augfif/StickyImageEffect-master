@@ -38,7 +38,7 @@ npm run depth        # 同步 tujia/ → 缩放 → 生成深度图；--force �
 | --- | --- | --- | --- |
 | 开场页 | [index.html](index.html) | `js/intro/index.js` | 电影感「走廊」自动播放 + 滚动推进十条内容 |
 | 主界面 | [main.html](main.html) | `js/index.js` | 可拖动切换的 sticky 视差幻灯片（五张照片） |
-| AI 网格 | [ai.html](ai.html) | `js/ai/index.js` | 4×2 八幅纹样，悬停时对面半屏放大并轮播该纹样的多角度图，点击进入生成页 |
+| AI 纹样目录 | [ai.html](ai.html) | `js/ai/index.js` | 十幅纹样排成竖列表，悬停时浮动大图跟随指针；触屏设备保留行内缩略图，点击进入生成页 |
 | 造型生成 | [ai-style.html](ai-style.html) | `js/ai/style.js` | 上传人物照片 → 调 ai-drawing 生成 → 展示与下载结果 |
 | — | [base.html](base.html) | — | 原始 Codrops 模板页，**不在 build 入口里，当前不可运行**，仅作历史参考 |
 
@@ -46,17 +46,18 @@ npm run depth        # 同步 tujia/ → 缩放 → 生成深度图；--force �
 右上角「跳过」平滑滚到这一屏而不是跳页面。AI 页的「返回」用 `index.html?at=end` 回到同一屏，
 该参数会跳过开场推镜直接落位。改这两个去向看 `js/intro/index.js` 的 `ROUTES`。
 
-AI 网格的每格是一个 `<a href="ai-style.html?pattern=<slug>">`，所以窄屏没有悬停预览时也能点进去。
+AI 纹样目录的每一行是一个 `<a href="ai-style.html?pattern=<slug>">`，所以窄屏没有悬停预览时也能点进去。
 
 `base.html` 用普通 `<script src="js/index.js">` 引入，而现代码是 ES module，
 所以它跑不起来；保留它只是为了对照上游模板。
 
 ## AI 互动与造型生成
 
-**内容只改 `js/ai/patterns.js`**：八个纹样按 `slug / title / meta` 排好，图片按文件名自动发现。
-`images/岩墙花.jpg` 是格子图与面板首帧，`images/岩墙花-2.jpg`、`-3.jpg` 是同一纹样的其余角度，
-悬停时在面板里交叉淡入；不放进图也不会让构建失败，只是不轮播。待补纹样标 `pending: true`，
-渲染成不可交互的占位格。`js/ai/copy.js` 收着两个 AI 页面的全部文案。
+**内容只改 `js/ai/patterns.js`**：十个纹样按 `slug / title / meta` 排好，图片按文件名自动发现。
+AI 两页只读 `images/ai/shots/<slug>.jpg`（同一纹样的其余角度可加 `-2.jpg`、`-3.jpg`，悬停时交叉淡入），
+这里放的是织物本体的扫描图，不直接复用 `images/岩墙花.jpg` 那批带人物的照片——后者是主界面和开场页的
+three.js 贴图，换掉会让视差构图错位。没有图的纹样标 `pending: true`，渲染成不可交互的占位行。
+`js/ai/copy.js` 收着两个 AI 页面的全部文案。
 
 **后端契约**（`ai-drawing/`，独立工程）：`POST /api/v1/styled-look`，`multipart/form-data`，
 四个必填字段 `person`（人物）、`fabric`（布匹，唯一换料原料）、`accessory`、`chair`，
@@ -74,16 +75,18 @@ AI 网格的每格是一个 `<a href="ai-style.html?pattern=<slug>">`，所以�
 
 ```
 index.html main.html        # 幻灯片与开场页
-ai.html ai-style.html       # AI 网格与造型生成
+ai.html ai-style.html       # AI 纹样目录与造型生成
 base.html                   # 遗留模板页，不构建
 css/
   base.css                  # reset + 配色变量 + 原生指针 + 加载动画
   intro.css                 # 只属于开场页
   styles.css                # 只属于主界面（含 @font-face 与响应式断点）
 fonts/                      # MaShanZheng 毛笔字体（自托管）
-images/                     # 页面真正引用的素材：原图 + 同名 -depth.png + 纹样多角度 -2/-3.jpg
+images/                     # 页面真正引用的素材：原图 + 同名 -depth.png
 images/opening/             # 开场布匹用的织物扫描图（已裁边、压缩）
-images/ai/                  # 生成请求用的默认配饰与椅子
+images/ai/                  # 提花底纹、生成请求用的默认配饰与椅子
+images/ai/source/           # 织物扫描原图，只用于重新生成 shots，不被页面加载
+images/ai/shots/            # AI 目录与生成页实际加载的压缩图（<slug>.jpg）
 tujia/                      # 原图投放目录，depth 工具从这里同步到 images/
 js/
   index.js                  # 主界面组装入口
@@ -103,9 +106,9 @@ js/
     beats.js                # ★ 开场页唯一需要改内容的文件
     progress.js             # 底部进度条
   ai/
-    index.js                # 网格页组装：按 patterns 建格子与链接
-    patterns.js             # ★ 八个纹样与图片自动发现，改内容改这里
-    grid-preview.js         # 悬停放大预览组件（技能 starter 原样搬入）
+    index.js                # 目录页组装：按 patterns 建行与链接
+    menu.js                 # 悬停浮动大图的跟随 / 擦入 / 键盘焦点
+    patterns.js             # ★ 十个纹样与 shots 自动发现，改内容改这里
     style.js                # 生成页：上传、提交、等待、结果三态
     copy.js                 # 两个 AI 页面的全部文案
 tools/depth/
@@ -122,7 +125,8 @@ codrops-grid-to-preview/    # AI 互动页的参考工程（.gitignore，不入�
 的原文值，`assets/grid-preview-starter/` 是纯 CSS + ESM、可直接拷进页面的三件套。
 
 它对应的参考工程是 `codrops-grid-to-preview/`（Codrops《Grid to Full Preview》，MIT），因为带 DALL·E
-生成的商品图，按仓库惯例只作本地参考、不随仓库分发。AI 互动页打算用这套效果。
+生成的商品图，按仓库惯例只作本地参考、不随仓库分发。AI 互动页后来改成了列表 + 浮动图方案，
+这套技能留作旧网格方案的历史参考。
 
 ## 数据流
 
@@ -177,9 +181,10 @@ codrops-grid-to-preview/    # AI 互动页的参考工程（.gitignore，不入�
 
 开场页同理，改 `js/intro/beats.js`。
 
-AI 网格的素材不走 `depth` 流程：直接把 `<纹样名>.jpg`（整体）、`<纹样名>-2.jpg`（纹样特写）、
-`<纹样名>-3.jpg`（材质细节）放进 `images/`，`js/ai/patterns.js` 会自动认到。建议 3:4 竖版、
-长边 ≥1200、单张 ≤1.5 MB；横图也能用（`object-fit: cover`），但同一个面板里混排会裁切得不一致。
+AI 目录的素材不走 `depth` 流程：原扫描图放 `images/ai/source/`，再把页面实际加载的压缩版本
+按 `<slug>.jpg` 放进 `images/ai/shots/`，`js/ai/patterns.js` 会自动认到；同一纹样的 `-2/-3`
+会作为悬停轮播的后续帧。竖长条扫描图可以直接放，列表缩略图和浮动大图都用 `object-fit: cover` 取中段；
+横图也能用，只是裁切位置会不同。
 
 > `images/1.jpg` ~ `5.jpg` 及配套深度图是上游模板留下的素材，当前代码没有引用。
 

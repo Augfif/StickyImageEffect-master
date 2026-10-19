@@ -1,34 +1,42 @@
 /**
- * The eight patterns on the AI grid, in reading order.
+ * The ten patterns on the AI picker, in reading order.
  *
- * Shots are discovered from the file names instead of being imported one by one:
+ * The AI pages use their own shots: `images/ai/shots/<slug>.jpg`, i.e. the
+ * cloth itself rather than the modelled photographs the opener and the
+ * slideshow are built around. Keeping them apart matters -- images/岩墙花.jpg
+ * and its depth map are what the three.js pages load, and swapping that file
+ * for a flat textile would break their parallax.
  *
- *   images/岩墙花.jpg      the tile picture, and the first frame in the pane
- *   images/岩墙花-2.jpg    a second angle, cross faded into the pane
- *   images/岩墙花-3.jpg    a third
+ * The full-resolution scans live in `images/ai/source/` only so the shots can
+ * be regenerated; neither page fetches them.
  *
- * Dropping the file in is enough -- nothing here has to change, a pattern with
- * one shot simply does not cycle, and a pattern with none does not break the
- * build.
+ * Shots are discovered from the file names instead of being imported one by
+ * one, so dropping a file in is enough:
+ *
+ *   images/ai/shots/yanqianghua.jpg      the shot
+ *   images/ai/shots/yanqianghua-2.jpg    a second angle, cross faded into it
+ *
+ * A pattern with one shot simply does not cycle, and one with none does not
+ * break the build.
  */
-const shotUrls = import.meta.glob("../../images/*.jpg", {
+const shotUrls = import.meta.glob("../../images/ai/shots/*.jpg", {
   eager: true,
   query: "?url",
   import: "default"
 });
 
-const shotsByName = new Map();
+const shotsBySlug = new Map();
 for (const [path, url] of Object.entries(shotUrls)) {
   const name = path.split("/").pop().replace(/\.[^.]+$/, "");
   const match = name.match(/^(.+?)(?:-(\d+))?$/);
   if (!match) continue;
-  const [, base, order] = match;
-  if (!shotsByName.has(base)) shotsByName.set(base, []);
-  shotsByName.get(base).push({ order: order ? Number(order) : 1, url });
+  const [, slug, order] = match;
+  if (!shotsBySlug.has(slug)) shotsBySlug.set(slug, []);
+  shotsBySlug.get(slug).push({ order: order ? Number(order) : 1, url });
 }
 
-function shotsFor(name) {
-  const shots = shotsByName.get(name) || [];
+function shotsFor(slug) {
+  const shots = shotsBySlug.get(slug) || [];
   return shots.sort((a, b) => a.order - b.order).map(shot => shot.url);
 }
 
@@ -54,5 +62,5 @@ export function patternBySlug(slug) {
 
 export function shotsForPattern(pattern) {
   if (!pattern || pattern.pending) return [];
-  return shotsFor(pattern.title);
+  return shotsFor(pattern.slug);
 }
