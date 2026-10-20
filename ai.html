@@ -5,10 +5,8 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <title>AI 互动 | 织造万象</title>
-  <meta name="description" content="选一块土家织锦，用 AI 把它换到你自己的造型上。" />
+  <meta name="description" content="选一块土家织锦，先看布面，再看上身，最后用 AI 把它换到你自己的造型上。" />
   <link rel="shortcut icon" href="favicon.ico" />
-  <!-- base.css brings the shared reset and native pointer styles; ai.css only
-       owns this page. -->
   <link rel="stylesheet" type="text/css" href="css/base.css" />
   <link rel="stylesheet" type="text/css" href="css/ai.css" />
   <script>
@@ -17,26 +15,50 @@
 </head>
 
 <body class="ai pl-loading">
-  <!-- A 土家织锦 macro shot, softened into a texture. Fixed so it reads as the
-       room rather than as something scrolling with the list. -->
   <div class="ai__texture" aria-hidden="true"></div>
 
-  <!-- In normal flow, not fixed: a fixed link used to float over the pictures
-       as the grid scrolled underneath it. -->
   <header class="ai__header">
     <div class="ai__heading">
       <p class="ai__eyebrow" id="ai-eyebrow"></p>
       <h1 class="ai__title" id="ai-title"></h1>
     </div>
-    <!-- Back to the opener's two doors, not to the top of the film: that is
-         the screen the reader came from. -->
     <a class="ai__back" id="ai-back" href="index.html?at=end">返回</a>
   </header>
 
-  <main>
-    <!-- Built from js/ai/patterns.js; js/ai/menu.js adds the hover reveal. -->
-    <ul class="pl" id="list"></ul>
+  <main class="sample">
+    <!-- Desktop table of contents. On phones it collapses into the rail. -->
+    <aside class="sample__index" aria-label="纹样目录">
+      <ol class="sample__list" id="sample-list"></ol>
+    </aside>
+
+    <!-- The same cloth has two faces: the scan and the model wearing it. -->
+    <section class="sample__stage" id="sample-stage" data-side="fabric">
+      <div class="sample__layers" id="sample-layers">
+        <img class="sample__person" id="sample-person" alt="" />
+        <div class="sample__cloth" id="sample-cloth" aria-hidden="true">
+          <div class="sample__ambient" id="sample-ambient"></div>
+          <div class="sample__fabric" id="sample-fabric"></div>
+        </div>
+      </div>
+      <div class="sample__shade" aria-hidden="true"></div>
+
+      <div class="sample__copy">
+        <p class="sample__number" id="sample-number"></p>
+        <h2 class="sample__name" id="sample-name"></h2>
+        <p class="sample__meta" id="sample-meta"></p>
+      </div>
+
+      <div class="sample__controls">
+        <div class="sample__switch" role="group" aria-label="查看布面或上身">
+          <button class="sample__switch-btn is-active" data-side="fabric" type="button">布面</button>
+          <button class="sample__switch-btn" data-side="person" type="button">上身</button>
+        </div>
+        <a class="sample__cta" id="sample-cta" href="#">用这块布换成我 <span aria-hidden="true">↗</span></a>
+      </div>
+    </section>
   </main>
+
+  <nav class="sample__rail" id="sample-rail" aria-label="快速选择纹样"></nav>
 
   <script type="module" src="/js/ai/index.js"></script>
 </body>
