@@ -11,7 +11,7 @@ npm run dev        # / 开场页、/main.html 主界面、/ai.html 纹样目录�
 右上角「跳过」平滑滚到这一屏，AI 页的「返回」用 `index.html?at=end` 回到同一屏。
 开场页的内容全在 `js/intro/beats.js`：
 
-AI 布样册的十幅纹样、布面大图和对应人物见 `js/ai/patterns.js`：一级看布面，二级看上身。
+AI 布样册的十幅纹样、布面大图和对应人物见 `js/ai/patterns.js`：一级布面默认显示人物上身卡，点卡展开二级上身。
 织物扫描原图放在 `images/ai/source/`，缩略条与生成页读取 `images/ai/shots/<slug>.jpg`；造型生成页需要 `ai-drawing` 后端
 在 8000 端口运行，`npm run dev` 与 `npm run preview` 会通过 `/api` 代理过去。
 十条目 `{ image, title, meta }`，`image: null` 的那几条就是还没补图的深色空框。只想调主界面的话

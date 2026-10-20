@@ -38,7 +38,7 @@ npm run depth        # 同步 tujia/ → 缩放 → 生成深度图；--force �
 | --- | --- | --- | --- |
 | 开场页 | [index.html](index.html) | `js/intro/index.js` | 电影感「走廊」自动播放 + 滚动推进十条内容 |
 | 主界面 | [main.html](main.html) | `js/index.js` | 可拖动切换的 sticky 视差幻灯片（五张照片） |
-| AI 纹样目录 | [ai.html](ai.html) | `js/ai/index.js` | 布样册：一级看布面，二级看同纹样上身；手机上全屏、桌面上左目录右布样 |
+| AI 纹样目录 | [ai.html](ai.html) | `js/ai/index.js` | 布样册：一级布面默认带人物上身卡，点卡展开二级上身；手机上全屏、桌面上左目录右布样 |
 | 造型生成 | [ai-style.html](ai-style.html) | `js/ai/style.js` | 上传配饰照片与自拍 → 调 ai-drawing 生成 → 展示与下载结果 |
 | — | [base.html](base.html) | — | 原始 Codrops 模板页，**不在 build 入口里，当前不可运行**，仅作历史参考 |
 

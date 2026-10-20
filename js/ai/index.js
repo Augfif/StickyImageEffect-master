@@ -7,6 +7,8 @@ const layers = document.getElementById("sample-layers");
 const fabric = document.getElementById("sample-fabric");
 const ambient = document.getElementById("sample-ambient");
 const person = document.getElementById("sample-person");
+const look = document.getElementById("sample-look");
+const lookImg = document.getElementById("sample-look-img");
 const number = document.getElementById("sample-number");
 const name = document.getElementById("sample-name");
 const meta = document.getElementById("sample-meta");
@@ -81,6 +83,10 @@ function paint(index) {
   person.alt = `${pattern.title}的上身展示`;
   person.style.setProperty("--person-x", `${focus.x}%`);
   person.style.setProperty("--person-y", `${focus.y}%`);
+  lookImg.src = pattern.person;
+  lookImg.alt = "";
+  lookImg.style.setProperty("--look-x", `${focus.x}%`);
+  lookImg.style.setProperty("--look-y", `${focus.y}%`);
   number.textContent = `${String(index + 1).padStart(2, "0")} / ${usable.length}`;
   name.textContent = pattern.title;
   meta.textContent = pattern.meta || "";
@@ -119,6 +125,8 @@ function select(index, instant = false) {
 switchButtons.forEach(button => {
   button.addEventListener("click", () => setSide(button.dataset.side));
 });
+
+look.addEventListener("click", () => setSide("person"));
 
 window.addEventListener("keydown", event => {
   if (event.target instanceof Element && event.target.closest("button, a")) {
