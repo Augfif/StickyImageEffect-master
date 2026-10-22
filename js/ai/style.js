@@ -2,7 +2,7 @@ import { aiCopy } from "./copy.js";
 import { accessories, defaultAccessoryUrl } from "./accessories.js";
 import { patternBySlug, shotsForPattern } from "./patterns.js";
 import chairUrl from "../../images/ai/chair.png";
-import demoResultUrl from "../../images/岩墙花.jpg";
+import demoResultUrl from "../../images/ai/demo-result.png";
 
 const copy = aiCopy.studio;
 
@@ -444,7 +444,7 @@ function showDemoResult() {
   ui.resultImage.src = demoResultUrl;
   ui.resultImage.alt = `${pattern.title} 造型结果`;
   ui.download.href = demoResultUrl;
-  ui.download.setAttribute("download", `${pattern.title}-造型.jpg`);
+  ui.download.setAttribute("download", `${pattern.title}-造型.png`);
   show("result");
 }
 
