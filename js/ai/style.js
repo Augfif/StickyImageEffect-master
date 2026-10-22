@@ -1,4 +1,5 @@
 import { aiCopy } from "./copy.js";
+import { accessories, defaultAccessoryUrl } from "./accessories.js";
 import { patternBySlug, shotsForPattern } from "./patterns.js";
 import chairUrl from "../../images/ai/chair.png";
 
@@ -53,11 +54,10 @@ const ui = {
   patternTitle: byId("pattern-title"),
   patternMeta: byId("pattern-meta"),
   patternCopy: byId("pattern-copy"),
-  accessoryDrop: byId("accessory-drop"),
-  accessoryInput: byId("accessory-input"),
   accessoryTitle: byId("accessory-title"),
   accessoryHint: byId("accessory-hint"),
-  accessoryPreview: byId("accessory-preview"),
+  accessoryCount: byId("accessory-count"),
+  accessoryOptions: byId("accessory-options"),
   selfieDrop: byId("selfie-drop"),
   selfieInput: byId("selfie-input"),
   selfieTitle: byId("selfie-title"),
@@ -79,8 +79,9 @@ const ui = {
 };
 
 const state = {
-  files: { accessory: null, selfie: null },
-  previewUrls: { accessory: null, selfie: null },
+  files: { selfie: null },
+  previewUrls: { selfie: null },
+  selectedAccessories: new Set(),
   resultUrl: null,
   controller: null,
   clockId: null,
@@ -89,17 +90,94 @@ const state = {
 };
 
 const uploads = {
-  accessory: {
-    drop: ui.accessoryDrop,
-    input: ui.accessoryInput,
-    preview: ui.accessoryPreview
-  },
   selfie: {
     drop: ui.selfieDrop,
     input: ui.selfieInput,
     preview: ui.selfiePreview
   }
 };
+
+function updateAccessoryCount() {
+  const count = state.selectedAccessories.size;
+  ui.accessoryCount.textContent =
+    `${copy.accessoryCountPrefix} ${count} ${copy.accessoryCountSuffix}`;
+}
+
+function createAccessoryCard(accessory) {
+  const label = document.createElement("label");
+  label.className = "studio__accessory";
+
+  const input = document.createElement("input");
+  input.type = "checkbox";
+  input.className = "studio__accessory-input";
+  input.value = accessory.id;
+  input.dataset.accessoryId = accessory.id;
+  input.setAttribute("aria-label", accessory.title);
+  input.addEventListener("change", () => {
+    if (input.checked) state.selectedAccessories.add(accessory.id);
+    else state.selectedAccessories.delete(accessory.id);
+    updateAccessoryCount();
+  });
+
+  const card = document.createElement("span");
+  card.className = "studio__accessory-card";
+
+  const image = document.createElement("img");
+  image.className = "studio__accessory-img";
+  image.src = accessory.image;
+  image.alt = "";
+  image.loading = "lazy";
+  image.decoding = "async";
+
+  const name = document.createElement("span");
+  name.className = "studio__accessory-name";
+  name.textContent = accessory.title;
+
+  const check = document.createElement("span");
+  check.className = "studio__accessory-check";
+  check.setAttribute("aria-hidden", "true");
+  check.textContent = "✓";
+
+  card.append(image, name, check);
+  label.append(input, card);
+  return label;
+}
+
+function renderAccessories() {
+  const groups = [
+    {
+      key: "wearable",
+      title: copy.accessoryWearableGroup,
+      items: accessories.filter(accessory => accessory.group === "wearable")
+    },
+    {
+      key: "scene",
+      title: copy.accessorySceneGroup,
+      items: accessories.filter(accessory => accessory.group === "scene")
+    }
+  ];
+
+  const fragment = document.createDocumentFragment();
+  groups.forEach(group => {
+    if (!group.items.length) return;
+    const section = document.createElement("div");
+    section.className = "studio__accessory-group";
+
+    const title = document.createElement("p");
+    title.className = "studio__accessory-group-title";
+    title.textContent = group.title;
+
+    const grid = document.createElement("div");
+    grid.className = "studio__accessory-grid";
+    group.items.forEach(accessory => grid.append(createAccessoryCard(accessory)));
+
+    section.append(title, grid);
+    fragment.append(section);
+  });
+
+  ui.accessoryOptions.replaceChildren(fragment);
+  updateAccessoryCount();
+}
 
 // --- static copy -----------------------------------------------------------
 
@@ -108,8 +186,8 @@ ui.invalidTitle.textContent = copy.invalidTitle;
 ui.invalidBody.textContent = copy.invalidBody;
 ui.invalidAction.textContent = copy.invalidAction;
 ui.patternEyebrow.textContent = copy.eyebrow;
-ui.accessoryTitle.textContent = copy.accessoryUploadTitle;
-ui.accessoryHint.textContent = copy.accessoryUploadHint;
+ui.accessoryTitle.textContent = copy.accessoryPickerTitle;
+ui.accessoryHint.textContent = copy.accessoryPickerHint;
 ui.selfieTitle.textContent = copy.selfieUploadTitle;
 ui.selfieHint.textContent = copy.selfieUploadHint;
 ui.waitingTitle.textContent = copy.waitingTitle;
@@ -127,6 +205,7 @@ ui.patternCopy.replaceChildren(
     return paragraph;
   })
 );
+renderAccessories();
 
 // --- states ----------------------------------------------------------------
 
@@ -172,7 +251,7 @@ function checkFile(file) {
 }
 
 function updateSubmit() {
-  const ready = Boolean(state.files.accessory && state.files.selfie);
+  const ready = Boolean(state.files.selfie);
   ui.submit.disabled = !ready;
   ui.submit.textContent = ready ? copy.submit : copy.submitDisabled;
 }
@@ -255,14 +334,19 @@ async function fetchBlob(url) {
 }
 
 // The backend takes four references: 人物、布匹、配饰、椅子. The selected
-// pattern supplies the fabric, the two uploads supply person and accessory,
-// and the chair stays a bundled default so the existing contract keeps working.
+// pattern supplies the fabric, the visitor's selfie supplies person, and the
+// accessory/chair picker is display-only for now, so both defaults stay fixed
+// to keep the existing API contract working.
 let presetsPromise = null;
 
 function loadPresets() {
   if (!presetsPromise) {
-    presetsPromise = Promise.all([fetchBlob(shots[0]), fetchBlob(chairUrl)])
-      .then(([fabric, chair]) => ({ fabric, chair }))
+    presetsPromise = Promise.all([
+      fetchBlob(shots[0]),
+      fetchBlob(defaultAccessoryUrl),
+      fetchBlob(chairUrl)
+    ])
+      .then(([fabric, accessory, chair]) => ({ fabric, accessory, chair }))
       .catch(error => {
         presetsPromise = null;
         throw error;
@@ -330,7 +414,7 @@ function showResult(blob, contentType) {
 }
 
 async function generate() {
-  if (!state.files.accessory || !state.files.selfie || state.busy) return;
+  if (!state.files.selfie || state.busy) return;
 
   state.busy = true;
   setError("");
@@ -345,7 +429,7 @@ async function generate() {
     const body = new FormData();
     body.append("person", state.files.selfie, state.files.selfie.name);
     body.append("fabric", presets.fabric, `${pattern.title}.jpg`);
-    body.append("accessory", state.files.accessory, state.files.accessory.name);
+    body.append("accessory", presets.accessory, "accessory.png");
     body.append("chair", presets.chair, "chair.png");
 
     const response = await fetch(ENDPOINT, {

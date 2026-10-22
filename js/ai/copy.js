@@ -14,14 +14,18 @@ export const aiCopy = {
     intro: [
       "这一页会把你选中的这块织锦，完整换到人物与配饰上——不是把图案叠上去，而是拆掉原来的面料重新包覆。",
       "这张就是本次的布料来源：AI 只从它取颜色、纹样、材质与光泽，并把它当作画面唯一的面料。",
-      "上传一张配饰照片和一张你的自拍，AI 会保留脸与身形，把服装和配饰统一换成这块布。生成通常要一到几分钟。"
+      "先勾选想搭配的配饰与场景，再上传一张你的自拍。AI 会保留脸与身形，把服装和配饰统一换成这块布。生成通常要一到几分钟。"
     ],
-    accessoryUploadTitle: "配饰照片",
-    accessoryUploadHint: "拖入或点击选择一张配饰或搭配物的照片，主体完整、光线均匀",
+    accessoryPickerTitle: "选择搭配",
+    accessoryPickerHint: "配饰与场景可多选，也可以不选",
+    accessoryWearableGroup: "随身配饰",
+    accessorySceneGroup: "场景家具",
+    accessoryCountPrefix: "已选",
+    accessoryCountSuffix: "件",
     selfieUploadTitle: "你的自拍",
     selfieUploadHint: "拖入或点击选择一张正面或半身自拍，脸和身形要完整",
     submit: "生成造型",
-    submitDisabled: "请先上传两张照片",
+    submitDisabled: "请先上传你的自拍",
     errorType: "只支持 JPG、PNG、WebP、BMP、GIF、TIFF、HEIC 这几种图片。",
     errorSize: "单张图片不能超过 30 MB。",
     waitingTitle: "正在生成",

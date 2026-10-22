@@ -37,14 +37,16 @@
       <div class="studio__copy" id="pattern-copy"></div>
 
       <div class="studio__uploads">
-        <label class="studio__drop" id="accessory-drop">
-          <input class="studio__file" id="accessory-input" type="file" accept="image/*" />
-          <span class="studio__drop-inner">
-            <strong class="studio__drop-title" id="accessory-title"></strong>
-            <span class="studio__drop-hint" id="accessory-hint"></span>
-          </span>
-          <img class="studio__preview" id="accessory-preview" alt="" hidden />
-        </label>
+        <section class="studio__accessories" aria-labelledby="accessory-title">
+          <div class="studio__accessories-head">
+            <div>
+              <h2 class="studio__accessories-title" id="accessory-title"></h2>
+              <p class="studio__accessories-hint" id="accessory-hint"></p>
+            </div>
+            <p class="studio__accessory-count" id="accessory-count" aria-live="polite"></p>
+          </div>
+          <div class="studio__accessory-groups" id="accessory-options"></div>
+        </section>
 
         <label class="studio__drop" id="selfie-drop">
           <input class="studio__file" id="selfie-input" type="file" accept="image/*" />
