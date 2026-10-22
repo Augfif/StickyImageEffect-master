@@ -250,6 +250,18 @@ GLManager.prototype.createPlane = function () {
         type: "v2",
         value: this.focuses[this.nextIndex]
       },
+      u_fabric1: {
+        type: "f",
+        value: this.data[this.currentIndex]?.motion === "pull" ? 1 : 0
+      },
+      u_fabric2: {
+        type: "f",
+        value: this.data[this.nextIndex]?.motion === "pull" ? 1 : 0
+      },
+      u_fabricPull: {
+        type: "f",
+        value: 0
+      },
       u_planeViewportScale: {
         type: "v2",
         value: this.getPlaneViewportScale()
@@ -324,6 +336,10 @@ GLManager.prototype.updateTexture = function (newIndex, progress) {
       this.currentIndex
     ];
     this.mesh.material.uniforms.u_texture2Focus.value = this.focuses[newIndex];
+    this.mesh.material.uniforms.u_fabric1.value =
+      this.data[this.currentIndex]?.motion === "pull" ? 1 : 0;
+    this.mesh.material.uniforms.u_fabric2.value =
+      this.data[newIndex]?.motion === "pull" ? 1 : 0;
     this.mesh.material.uniforms.u_depth.value = this.depths[this.currentIndex];
     this.mesh.material.uniforms.u_depth2.value = this.depths[newIndex];
 
@@ -348,6 +364,14 @@ GLManager.prototype.updateStickEffect = function ({
   this.mesh.material.uniforms.u_direction.value = direction;
   this.mesh.material.uniforms.u_waveIntensity.value = waveIntensity;
   // this.render();
+};
+
+// Fabric slides use this instead of the usual photo-only deformation. The
+// value is already normalized to a small UV offset by Showcase.
+GLManager.prototype.updateFabricPull = function (pull) {
+  if (!this.mesh) return;
+  this.mesh.material.uniforms.u_fabricPull.value = pull;
+  if (!this.loopRaf) this.render();
 };
 
 // Pointer position, normalized to [-1, 1] and smoothed by Showcase's spring,
