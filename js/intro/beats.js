@@ -57,19 +57,19 @@ export const introBeats = [
   {
     image: catfoot,
     title: "猫脚迹花",
-    meta: "山形兴旺万物生",
+    meta: "猫迹成花步步春",
     fabric: { x: 50, y: 50, zoom: 1.04 }
   },
   {
     image: dragonphoenix,
     title: "龙凤呈祥",
-    meta: "五谷丰登仓廪盈",
+    meta: "龙凤呈祥万事兴",
     fabric: { x: 50, y: 50, zoom: 1.04 }
   },
   {
     image: suoluo,
     title: "梭罗树",
-    meta: "万字窗格福常驻",
+    meta: "梭罗成荫福绵长",
     fabric: { x: 50, y: 50, zoom: 1.04 }
   },
   {
