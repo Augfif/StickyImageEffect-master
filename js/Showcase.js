@@ -27,8 +27,6 @@ function Showcase(data, options = {}) {
   this.progress = 0;
   this.direction = 1;
   this.waveIntensity = 0;
-  this.fabricPull = 0;
-  this.fabricPullSpring = null;
 
   // Set while the copy sheet is open: the slideshow keeps whatever pose it
   // was in, but no new zoom out / drag gesture can start.
@@ -135,13 +133,6 @@ Showcase.prototype.onMouseMove = function (ev) {
 Showcase.prototype.onGrabMove = function (scroll) {
   if (this.locked && !this.grabbing) return;
 
-  this.fabricPull = clamp(
-    (scroll.delta / window.innerHeight) * 0.28,
-    -0.1,
-    0.1
-  );
-  this.GL.updateFabricPull(this.fabricPull);
-
   this.index.target = clamp(
     this.index.initial + scroll.delta / this.index.scrollSize,
     -this.data.length + 0.51,
@@ -216,13 +207,6 @@ Showcase.prototype.onGrabStart = function () {
   }
   this.GL.scheduleLoop();
 
-  if (this.fabricPullSpring) {
-    this.fabricPullSpring.stop();
-    this.fabricPullSpring = null;
-  }
-  this.fabricPull = 0;
-  this.GL.updateFabricPull(0);
-
   const directionSpring = spring({
     from: this.progress === 0 ? 0 : this.direction,
     to: 0,
@@ -238,10 +222,9 @@ Showcase.prototype.onGrabStart = function () {
     damping: 500
   });
 
-  const waveTarget = this.data[this.index.active]?.waveIntensity ?? 0.5;
   const waveIntensitySpring = spring({
     from: this.waveIntensity,
-    to: waveTarget,
+    to: 0.5,
     mass: 5,
     stiffness: 10,
     damping: 200
@@ -308,19 +291,6 @@ Showcase.prototype.onGrabEnd = function () {
   // this.slides.disperse(this.index.active);
 
   this.snapCurrentToActiveIndex();
-
-  if (this.fabricPullSpring) {
-    this.fabricPullSpring.stop();
-  }
-  this.fabricPullSpring = spring({
-    from: this.fabricPull,
-    to: 0,
-    stiffness: 260,
-    damping: 28
-  }).start(value => {
-    this.fabricPull = value;
-    this.GL.updateFabricPull(value);
-  });
 
   if (this.GLStickPop) {
     this.GLStickPop.stop();

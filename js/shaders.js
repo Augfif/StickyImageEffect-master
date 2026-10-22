@@ -14,11 +14,6 @@ uniform vec2 u_texture2Fit;
 // composed around a subject instead of always being centered.
 uniform vec2 u_textureFocus;
 uniform vec2 u_texture2Focus;
-// 1 for a fabric-only slide, 0 for a modelled photograph.
-uniform float u_fabric1;
-uniform float u_fabric2;
-// Signed UV offset driven by the vertical drag on fabric slides.
-uniform float u_fabricPull;
 // Viewport UV per plane UV, the plane is wider than the visible frustum.
 uniform vec2 u_planeViewportScale;
 
@@ -72,10 +67,6 @@ void main(){
         u_texture2Fit,
         u_texture2Focus
     );
-    // On fabric slides the drag pulls the weave itself along the cloth, while
-    // photographs keep the usual stick-and-wave deformation.
-    sample1.y -= u_fabricPull * u_fabric1;
-    sample2.y -= u_fabricPull * u_fabric2;
 
     // The letterbox test uses the undisplaced position, so the margins stay
     // put while the picture slides inside its frame.

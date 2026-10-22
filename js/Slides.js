@@ -49,7 +49,6 @@ class Slides {
       const copy = createEleWithClass("div", "slide-copy");
       const title = createEleWithClass("h1", "slide-title");
       const meta = createEleWithClass("p", "slide-meta");
-      const kicker = createEleWithClass("p", "slide-kicker");
       // A button, not a link: it opens the sheet in place and keyboard
       // activation (Enter / Space) comes for free.
       const more = createEleWithClass("button", "slide-more");
@@ -60,9 +59,7 @@ class Slides {
       }
       meta.innerHTML = entry.meta;
       title.innerHTML = entry.title;
-      if (entry.kicker) kicker.textContent = entry.kicker;
       more.innerHTML = 'Read more';
-      if (entry.kicker) copy.appendChild(kicker);
       copy.appendChild(meta);
       copy.appendChild(title);
       slide.appendChild(copy);
