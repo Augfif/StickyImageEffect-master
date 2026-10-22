@@ -222,9 +222,10 @@ Showcase.prototype.onGrabStart = function () {
     damping: 500
   });
 
+  const waveTarget = this.data[this.index.active]?.waveIntensity ?? 0.5;
   const waveIntensitySpring = spring({
     from: this.waveIntensity,
-    to: 0.5,
+    to: waveTarget,
     mass: 5,
     stiffness: 10,
     damping: 200

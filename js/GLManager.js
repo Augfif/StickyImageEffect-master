@@ -69,6 +69,9 @@ function GLManager(data) {
   );
   this.depths = data.map((entry, i) => {
     const flat = createFlatDepthTexture();
+    // Fabric-only interludes have no depth map; the flat texture is already
+    // the correct neutral fallback.
+    if (!entry.depth) return flat;
     this.loader.load(
       entry.depth,
       texture => {

@@ -131,6 +131,16 @@ canvas {
   will-change: transform, opacity;
 }
 
+.slide-kicker {
+  margin: 0 0 0.42rem;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: clamp(0.6rem, 0.9vw, 0.72rem);
+  letter-spacing: 0.26em;
+  text-indent: 0.26em;
+  color: #c29a5b;
+  text-shadow: 0 1px 10px rgba(0, 0, 0, 0.8);
+}
+
 .slide-meta {
   margin: 0;
   font-size: clamp(0.85rem, 3.6vw, 1.15rem);
@@ -140,6 +150,7 @@ canvas {
   -moz-osx-font-smoothing: grayscale;
 }
 
+.slide-kicker,
 .slide-meta,
 .slide-more {
   opacity: 0;
@@ -154,10 +165,21 @@ canvas {
     transform 420ms cubic-bezier(0.2, 1, 0.3, 1);
 }
 
+.slide-kicker {
+  transition: opacity 900ms cubic-bezier(0.2, 1, 0.3, 1),
+    transform 420ms cubic-bezier(0.2, 1, 0.3, 1);
+}
+
+.show-meta .slide-kicker,
 .show-meta .slide-meta,
 .show-meta .slide-more {
   opacity: 1;
   transition: opacity 1500ms 300ms cubic-bezier(0.2, 1, 0.3, 1);
+}
+
+.show-meta .slide-kicker {
+  transition: opacity 1500ms 300ms cubic-bezier(0.2, 1, 0.3, 1),
+    transform 420ms cubic-bezier(0.2, 1, 0.3, 1);
 }
 
 .show-meta .slide-meta {
@@ -171,7 +193,8 @@ canvas {
    on .slide-copy itself -- a different element -- so hovering the centred copy
    cannot fight the animation the panel is driving. */
 .slide-copy:hover .slide-title,
-.slide-copy:hover .slide-meta {
+.slide-copy:hover .slide-meta,
+.slide-copy:hover .slide-kicker {
   transform: translateY(-6px);
 }
 
@@ -189,7 +212,8 @@ canvas {
    to stay legible there (desktop normally has none, the copy sits on the dark
    left column instead). */
 .is-reading .slide-title,
-.is-reading .slide-meta {
+.is-reading .slide-meta,
+.is-reading .slide-kicker {
   text-shadow: 0 2px 24px rgba(0, 0, 0, 0.8);
 }
 
@@ -559,6 +583,11 @@ canvas {
 
   .slide-meta {
     font-size: 1.35rem;
+    text-shadow: none;
+  }
+
+  .slide-kicker {
+    color: #c29a5b;
     text-shadow: none;
   }
 

@@ -8,12 +8,9 @@ import jiumeihua from "../images/九朵梅.jpg";
 import jiumeihuaDepth from "../images/九朵梅-depth.png";
 import yizihua from "../images/椅子花.jpg";
 import yizihuaDepth from "../images/椅子花-depth.png";
-import liyu from "../images/鲤鱼跃龙门.jpg";
-import liyuDepth from "../images/鲤鱼跃龙门-depth.png";
-import yangqueniao from "../images/阳雀鸟.jpg";
-import yangqueniaoDepth from "../images/阳雀鸟-depth.png";
-import sishibagou from "../images/四十八勾.jpg";
-import sishibagouDepth from "../images/四十八勾-depth.png";
+import liyuFabric from "../images/opening/carp.jpg";
+import yangqueFabric from "../images/opening/magpie-crop.jpg";
+import sishibagouFabric from "../images/opening/hook.jpg";
 import shanxinghua from "../images/山兴花.jpg";
 import shanxinghuaDepth from "../images/山兴花-depth.png";
 import babajia from "../images/粑粑架.jpg";
@@ -71,34 +68,34 @@ const slidesData = [
       "<p>把土家木屋里的太师椅提炼成几何图案——靠背、扶手、椅腿都被压平成方块与折线。</p><p>它考的是织工是否工整：线条一旦歪斜，椅子就散了架，所以在西兰卡普里属于高难纹样。</p>"
   },
   {
-    image: liyu,
-    depth: liyuDepth,
-    // 横图：桌面用 <1 的 zoom 把整张照片缩成右侧卡片（左 30% 留暗底给标题，
-    // 与竖图那几张的观感一致）；手机上 cover 本身已裁到 28.6% 宽，zoom 1 即可。
-    focus: { x: 0.286, y: 0.5, zoom: 0.68 },
-    focusMobile: { x: 0.52, y: 0.5, zoom: 1 },
+    // 布面插段：保留原始比例，桌面偏右成展签，手机居中完整显示。
+    image: liyuFabric,
+    focus: { x: 0.22, y: 0.5, zoom: 1 },
+    focusMobile: { x: 0.5, y: 0.5, zoom: 1.5 },
+    kicker: "布面",
+    waveIntensity: 0.32,
     title: "鲤鱼跃龙门",
     meta: "鲤跃锦图盼前程",
     detail:
       "<p>晚近融合进来的吉祥纹样，红、黑、蓝三色搭配，画面饱满热闹。鲤鱼跃过龙门，寄托寒窗成才、前程顺遂的祝愿。</p><p>它比传统几何纹样更像一幅叙事画：鱼、浪、门都铺在同一块布上。</p>"
   },
   {
-    image: yangqueniao,
-    depth: yangqueniaoDepth,
-    // 竖图，人物与斜挂的长织锦偏右下，聚焦点相应右移。
-    focus: { x: 0.3, y: 0.5, zoom: 1.6 },
-    focusMobile: { x: 0.53, y: 0.55, zoom: 1.5 },
-    title: "阳雀鸟",
+    image: yangqueFabric,
+    focus: { x: 0.22, y: 0.5, zoom: 1 },
+    focusMobile: { x: 0.5, y: 0.5, zoom: 1 },
+    kicker: "布面",
+    waveIntensity: 0.32,
+    title: "阳雀花",
     meta: "阳雀成双载希望",
     detail:
-      "<p>土家的代表性动物纹样。传说阳雀一叫，春耕就开始了，所以它常以成对的姿态出现。</p><p>成双的阳雀象征新生与希望，也寄托着对来年收成的期盼。</p>"
+      "<p>阳雀花把阳雀与花枝组织在同一条长织锦上。传说阳雀一叫，春耕就开始了，所以它常以成对的姿态出现。</p><p>成双的阳雀象征新生与希望，也寄托着对来年收成的期盼。</p>"
   },
   {
-    image: sishibagou,
-    depth: sishibagouDepth,
-    // 横图，与鲤鱼跃龙门同一套处理：缩成右侧卡片，左边留暗底给标题。
-    focus: { x: 0.3, y: 0.5, zoom: 0.68 },
-    focusMobile: { x: 0.5, y: 0.5, zoom: 1 },
+    image: sishibagouFabric,
+    focus: { x: 0.22, y: 0.5, zoom: 1 },
+    focusMobile: { x: 0.5, y: 0.5, zoom: 1.5 },
+    kicker: "布面",
+    waveIntensity: 0.32,
     title: "四十八勾",
     meta: "四十八勾巧相扣",
     detail:

@@ -134,7 +134,7 @@ codrops-grid-to-preview/    # AI 互动页的参考工程（.gitignore，不入�
 
 一条链，按顺序读就能理解：
 
-1. `js/index.js` 里 `slidesData` 是唯一的数据源，每条 `{ image, depth, focus, focusMobile, title, meta }`。
+1. `js/index.js` 里 `slidesData` 是唯一的数据源，每条 `{ image, depth?, focus, focusMobile, title, meta, kicker?, waveIntensity? }`。
 2. `Grab.js` 监听 `mousedown/mousemove/mouseup`（以及对应 touch）——**翻页靠拖拽，不是滚轮，也不是原生滚动**。
 3. `Showcase.js` 把拖动位移换算成 `index.target`，并用 popmotion 弹簧驱动：
    - `u_progress / u_direction / u_waveIntensity`：拖拽时照片「棒状凸起 + 波动」的顶点动画；
@@ -144,6 +144,9 @@ codrops-grid-to-preview/    # AI 互动页的参考工程（.gitignore，不入�
 6. 渲染是**按需触发**的：`render()` 在材质变化时手动调用；只有拖拽期间 `scheduleLoop()` 才开 rAF 循环。
 7. DOM 层互不耦合：`Slides` 管文案与 class 状态，`Progress` 管右侧进度条，`Sheet` 管白色内容面板。
    `Sheet` 打开时 `Showcase.setLocked(true)` 锁住手势，`Slides.setReading()` 用指数跟随把文案送到画面中心。
+
+第 4–6 张是布面插段，复用 `images/opening/` 的裁切图；它们没有 depth map，渲染层会退化为中性平面深度。
+布面在手机上保持原始比例并居中放大裁切，`waveIntensity` 降为 `0.32`，与人物页的全屏照片形成节奏差异。
 
 ### 开场页（index.html）
 
