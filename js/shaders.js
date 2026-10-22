@@ -14,6 +14,8 @@ uniform vec2 u_texture2Fit;
 // composed around a subject instead of always being centered.
 uniform vec2 u_textureFocus;
 uniform vec2 u_texture2Focus;
+uniform float u_progress;
+uniform float u_depthShift;
 // Viewport UV per plane UV, the plane is wider than the visible frustum.
 uniform vec2 u_planeViewportScale;
 
@@ -55,15 +57,20 @@ void main(){
     vec2 base1 = toImageUV(viewportUV, u_textureFit, u_textureFocus);
     vec2 base2 = toImageUV(viewportUV, u_texture2Fit, u_texture2Focus);
 
+    float d1 = depthAt(u_depth, base1);
+    float d2 = depthAt(u_depth2, base2);
+
     // Sampling at (uv - offset) moves the close pixels towards the pointer.
     // u_mouse is +1 at the right edge and +1 at the top edge.
+    vec2 depthOffset1 = vec2(0.0, (d1 - 0.5) * u_depthShift);
+    vec2 depthOffset2 = vec2(0.0, (d2 - 0.5) * u_depthShift);
     vec2 sample1 = toImageUV(
-        viewportUV - parallaxOffset(depthAt(u_depth, base1)),
+        viewportUV - parallaxOffset(d1) - depthOffset1,
         u_textureFit,
         u_textureFocus
     );
     vec2 sample2 = toImageUV(
-        viewportUV - parallaxOffset(depthAt(u_depth2, base2)),
+        viewportUV - parallaxOffset(d2) - depthOffset2,
         u_texture2Fit,
         u_texture2Focus
     );
@@ -72,6 +79,15 @@ void main(){
     // put while the picture slides inside its frame.
     vec4 color1 = mix(vec4(u_background, 1.0), texture2D(u_texture, sample1), insideImage(base1));
     vec4 color2 = mix(vec4(u_background, 1.0), texture2D(u_texture2, sample2), insideImage(base2));
+
+    // A slow warm sweep follows the drag, catching the closer parts of the
+    // photograph and leaving the background calm.
+    float sweepX = mix(0.15, 0.85, u_progress);
+    float sweep = smoothstep(0.11, 0.0, abs(viewportUV.x - sweepX)) * u_progress;
+    float sheen1 = sweep * smoothstep(0.35, 0.8, d1) * insideImage(base1);
+    float sheen2 = sweep * smoothstep(0.35, 0.8, d2) * insideImage(base2);
+    color1.rgb += vec3(0.1, 0.075, 0.045) * sheen1;
+    color2.rgb += vec3(0.1, 0.075, 0.045) * sheen2;
 
     gl_FragColor = mix(color1, color2, u_textureProgress);
 }

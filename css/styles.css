@@ -629,3 +629,62 @@ canvas {
     color: rgba(255, 255, 255, 0.7);
   }
 }
+
+/* Three framing passes share one slideshow, but not one typographic voice. */
+.slide {
+  position: relative;
+}
+
+.slide-copy,
+.slide-more {
+  position: relative;
+  z-index: 1;
+}
+
+.slide--mid::before,
+.slide--close::before {
+  content: attr(data-index);
+  position: absolute;
+  left: -0.08em;
+  bottom: -0.18em;
+  z-index: 0;
+  pointer-events: none;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: clamp(4.5rem, 10vw, 8rem);
+  line-height: 0.82;
+  letter-spacing: -0.08em;
+  color: rgba(255, 255, 255, 0.075);
+  transition: opacity 500ms ease;
+}
+
+.slide--close::before {
+  font-size: clamp(7rem, 16vw, 13rem);
+  color: rgba(255, 255, 255, 0.1);
+}
+
+.slide--mid .slide-title {
+  font-size: clamp(2rem, 11vw, 4.4rem);
+}
+
+.slide--close .slide-title {
+  font-size: clamp(1.8rem, 9vw, 3.8rem);
+  letter-spacing: 0.1em;
+}
+
+.slide--mid .slide-meta {
+  letter-spacing: 0.16em;
+}
+
+.is-reading .slide::before {
+  opacity: 0;
+}
+
+@media (min-width: 53em) {
+  .slide--mid .slide-title {
+    font-size: 6vw;
+  }
+
+  .slide--close .slide-title {
+    font-size: 4.8vw;
+  }
+}

@@ -12,6 +12,29 @@ import {
   reach
 } from "./reach";
 
+// Three motion temperaments, keyed by the framing pass. They share the same
+// drag gesture but differ in how the photograph answers it.
+const MOTION_PRESETS = {
+  full: {
+    wave: 0.5,
+    progress: { mass: 5, stiffness: 350, damping: 500 },
+    waveSpring: { mass: 5, stiffness: 10, damping: 200 },
+    release: { mass: 4, stiffness: 400, damping: 70 }
+  },
+  mid: {
+    wave: 0.34,
+    progress: { mass: 6, stiffness: 300, damping: 480 },
+    waveSpring: { mass: 6, stiffness: 8, damping: 160 },
+    release: { mass: 4.5, stiffness: 350, damping: 80 }
+  },
+  close: {
+    wave: 0.18,
+    progress: { mass: 7, stiffness: 250, damping: 500 },
+    waveSpring: { mass: 1.5, stiffness: 35, damping: 120 },
+    release: { mass: 5, stiffness: 300, damping: 90 }
+  }
+};
+
 // onFullscreenStart
 // onFullscreenFinish
 // onZoomOutStart
@@ -214,20 +237,19 @@ Showcase.prototype.onGrabStart = function () {
     stiffness: 800,
     damping: 2000
   });
+  const preset =
+    MOTION_PRESETS[this.data[this.index.active]?.shot] ||
+    MOTION_PRESETS.full;
   const progressSpring = spring({
     from: this.progress,
     to: 1,
-    mass: 5,
-    stiffness: 350,
-    damping: 500
+    ...preset.progress
   });
 
   const waveIntensitySpring = spring({
     from: this.waveIntensity,
-    to: 0.5,
-    mass: 5,
-    stiffness: 10,
-    damping: 200
+    to: preset.wave,
+    ...preset.waveSpring
   });
   this.GLStickPop = parallel(
     progressSpring,
@@ -292,6 +314,9 @@ Showcase.prototype.onGrabEnd = function () {
 
   this.snapCurrentToActiveIndex();
 
+  const preset =
+    MOTION_PRESETS[this.data[this.index.active]?.shot] ||
+    MOTION_PRESETS.full;
   if (this.GLStickPop) {
     this.GLStickPop.stop();
   }
@@ -305,9 +330,7 @@ Showcase.prototype.onGrabEnd = function () {
   const progressSpring = spring({
     from: this.progress,
     to: 0,
-    mass: 4,
-    stiffness: 400,
-    damping: 70,
+    ...preset.release,
     restDelta: 0.0001
   });
   const waveIntensitySpring = spring({

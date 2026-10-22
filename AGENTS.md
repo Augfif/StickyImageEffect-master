@@ -134,7 +134,7 @@ codrops-grid-to-preview/    # AI 互动页的参考工程（.gitignore，不入�
 
 一条链，按顺序读就能理解：
 
-1. `js/index.js` 里 `slidesData` 是唯一的数据源，每条 `{ image, depth, focus, focusMobile, title, meta }`。
+1. `js/index.js` 里 `slidesData` 是唯一的数据源，每条 `{ image, depth, focus, focusMobile, title, meta, shot? }`。
 2. `Grab.js` 监听 `mousedown/mousemove/mouseup`（以及对应 touch）——**翻页靠拖拽，不是滚轮，也不是原生滚动**。
 3. `Showcase.js` 把拖动位移换算成 `index.target`，并用 popmotion 弹簧驱动：
    - `u_progress / u_direction / u_waveIntensity`：拖拽时照片「棒状凸起 + 波动」的顶点动画；
@@ -144,6 +144,10 @@ codrops-grid-to-preview/    # AI 互动页的参考工程（.gitignore，不入�
 6. 渲染是**按需触发**的：`render()` 在材质变化时手动调用；只有拖拽期间 `scheduleLoop()` 才开 rAF 循环。
 7. DOM 层互不耦合：`Slides` 管文案与 class 状态，`Progress` 管右侧进度条，`Sheet` 管白色内容面板。
    `Sheet` 打开时 `Showcase.setLocked(true)` 锁住手势，`Slides.setReading()` 用指数跟随把文案送到画面中心。
+
+`shot` 在 `full / mid / close` 三档之间切换：`GLManager` 调整同一张人物照的取景，`Showcase` 切换
+鼓起、波浪和回弹的弹簧参数；中景/近景还会显示低透明度的序号。拖拽时的 `u_depthShift` 和暖色光扫
+只作用于前景深度，不改变人物照片本身的构图。
 
 ### 开场页（index.html）
 

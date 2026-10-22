@@ -54,6 +54,8 @@ class Slides {
       const more = createEleWithClass("button", "slide-more");
       more.type = "button";
       slide.classList.add(index !== 0 ? "next" : "show-meta");
+      slide.classList.add(`slide--${entry.shot || "full"}`);
+      slide.dataset.index = String(index + 1).padStart(2, "0");
       if (CJK.test(entry.title) || CJK.test(entry.meta)) {
         slide.classList.add("slide--cjk");
       }

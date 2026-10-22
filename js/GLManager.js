@@ -15,6 +15,14 @@ const COVER_MARGIN = 0.97;
 // Must stay in sync with "@media (min-width: 53em)" in css/styles.css: above it
 // the desktop composition applies, below it slides may use their phone crop.
 const DESKTOP_QUERY = "(min-width: 53em)";
+// Three framing passes for the person slides. The base focus values were tuned
+// for a full-length look; these multipliers move the same subject closer
+// without changing the source photo.
+const SHOT_PRESETS = {
+  full: { zoom: 1, y: 0 },
+  mid: { zoom: 1.16, y: 0.045 },
+  close: { zoom: 1.32, y: 0.085 }
+};
 
 // Flat depth: used before a depth map is decoded and whenever one is missing,
 // so a slide without a depth map simply has no parallax instead of breaking.
@@ -148,7 +156,8 @@ GLManager.prototype.calculateFit = function (index, texture) {
   const isDesktop = window.matchMedia(DESKTOP_QUERY).matches;
   const focus =
     (isDesktop ? entry.focus : entry.focusMobile || entry.focus) || {};
-  const zoom = focus.zoom > 0 ? focus.zoom : 1;
+  const shot = SHOT_PRESETS[entry.shot] || SHOT_PRESETS.full;
+  const zoom = (focus.zoom > 0 ? focus.zoom : 1) * shot.zoom;
   const viewportAspect = window.innerWidth / window.innerHeight;
   const imageAspect = image.width / image.height;
   const ratio = viewportAspect / imageAspect;
@@ -169,7 +178,7 @@ GLManager.prototype.calculateFit = function (index, texture) {
   );
   this.focuses[index] = new THREE.Vector2(
     clampUnit(focus.x),
-    clampUnit(focus.y)
+    clampUnit(focus.y + shot.y)
   );
 
   if (!this.mesh) return;
@@ -263,6 +272,10 @@ GLManager.prototype.createPlane = function () {
         type: "f",
         value: 0
       },
+      u_depthShift: {
+        type: "f",
+        value: 0
+      },
       u_direction: {
         type: "f",
         value: 1
@@ -342,6 +355,7 @@ GLManager.prototype.updateStickEffect = function ({
   waveIntensity
 }) {
   this.mesh.material.uniforms.u_progress.value = progress;
+  this.mesh.material.uniforms.u_depthShift.value = progress * 0.032;
   this.mesh.material.uniforms.u_direction.value = direction;
   this.mesh.material.uniforms.u_waveIntensity.value = waveIntensity;
   // this.render();

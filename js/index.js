@@ -35,6 +35,7 @@ const slidesData = [
   {
     image: tujia,
     depth: tujiaDepth,
+    shot: "full",
     // 聚焦在画中布匹上：x/y 是落在画面中心的图片坐标（y 自下往上），
     // zoom 越大越近。zoom 1.6 保留完整人物，照片收成右侧一块竖画面。
     focus: { x: 0.3, y: 0.55, zoom: 1.6 },
@@ -49,6 +50,7 @@ const slidesData = [
   {
     image: jiumeihua,
     depth: jiumeihuaDepth,
+    shot: "mid",
     // 与第一张同一套处理：桌面保留完整人物、照片收成右侧竖画面，
     // y 略抬到 0.58 是因为这张的头饰更高，避免切到银冠顶部。
     focus: { x: 0.3, y: 0.58, zoom: 1.6 },
@@ -62,6 +64,7 @@ const slidesData = [
   {
     image: yizihua,
     depth: yizihuaDepth,
+    shot: "close",
     // 竖图同一套处理；y 抬到 0.60 是因为人物与横织锦整体偏上。
     focus: { x: 0.3, y: 0.6, zoom: 1.6 },
     focusMobile: { x: 0.48, y: 0.55, zoom: 1.45 },
@@ -73,6 +76,7 @@ const slidesData = [
   {
     image: liyu,
     depth: liyuDepth,
+    shot: "full",
     // 横图：桌面用 <1 的 zoom 把整张照片缩成右侧卡片（左 30% 留暗底给标题，
     // 与竖图那几张的观感一致）；手机上 cover 本身已裁到 28.6% 宽，zoom 1 即可。
     focus: { x: 0.286, y: 0.5, zoom: 0.68 },
@@ -85,6 +89,7 @@ const slidesData = [
   {
     image: yangqueniao,
     depth: yangqueniaoDepth,
+    shot: "mid",
     // 竖图，人物与斜挂的长织锦偏右下，聚焦点相应右移。
     focus: { x: 0.3, y: 0.5, zoom: 1.6 },
     focusMobile: { x: 0.53, y: 0.55, zoom: 1.5 },
@@ -96,6 +101,7 @@ const slidesData = [
   {
     image: sishibagou,
     depth: sishibagouDepth,
+    shot: "close",
     // 横图，与鲤鱼跃龙门同一套处理：缩成右侧卡片，左边留暗底给标题。
     focus: { x: 0.3, y: 0.5, zoom: 0.68 },
     focusMobile: { x: 0.5, y: 0.5, zoom: 1 },
@@ -107,6 +113,7 @@ const slidesData = [
   {
     image: shanxinghua,
     depth: shanxinghuaDepth,
+    shot: "full",
     focus: { x: 0.3, y: 0.5, zoom: 0.68 },
     focusMobile: { x: 0.5, y: 0.5, zoom: 1 },
     title: "山兴花",
@@ -117,6 +124,7 @@ const slidesData = [
   {
     image: babajia,
     depth: babajiaDepth,
+    shot: "mid",
     focus: { x: 0.3, y: 0.5, zoom: 0.68 },
     focusMobile: { x: 0.5, y: 0.5, zoom: 1 },
     title: "粑粑架",
@@ -127,6 +135,7 @@ const slidesData = [
   {
     image: wanzigechuanghua,
     depth: wanzigechuanghuaDepth,
+    shot: "close",
     // 竖图，织锦抱在人物右侧；比标准的 0.30 往右挪一点保留花纹，但别挪多——
     // 过了 0.4 照片会整个左移，标题就压在花纹上了。
     focus: { x: 0.35, y: 0.55, zoom: 1.6 },
@@ -139,6 +148,7 @@ const slidesData = [
   {
     image: laoshujianv,
     depth: laoshujianvDepth,
+    shot: "full",
     // 竖图，人物手里的长幡偏左，聚焦点略向左。
     focus: { x: 0.38, y: 0.55, zoom: 1.6 },
     focusMobile: { x: 0.46, y: 0.55, zoom: 1.5 },
