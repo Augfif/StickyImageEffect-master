@@ -63,11 +63,15 @@
     </div>
   </section>
 
-  <!-- 2. waiting: the backend allows 300s, so say so and let people leave. -->
+  <!-- 2. waiting: the demo runs a fixed 20s job, so show real progress. -->
   <section class="studio__state studio__state--center" id="state-waiting" hidden aria-live="polite">
     <p class="studio__waiting-title" id="waiting-title"></p>
     <p class="studio__waiting-stage" id="waiting-stage"></p>
     <p class="studio__waiting-time" id="waiting-time">00:00</p>
+    <div class="studio__progress" id="waiting-progress" role="progressbar"
+      aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+      <span class="studio__progress-fill" id="waiting-bar"></span>
+    </div>
     <p class="studio__waiting-hint" id="waiting-hint"></p>
     <button class="studio__ghost" id="cancel" type="button"></button>
   </section>

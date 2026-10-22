@@ -425,6 +425,26 @@ body {
   color: rgba(255, 255, 255, 0.5);
 }
 
+/* A 20s demo job actually finishes, so the bar can show real progress instead
+   of an indeterminate shimmer. The 250ms transition matches the JS clock tick
+   and smooths each step into continuous motion. */
+.studio__progress {
+  width: min(78vw, 360px);
+  height: 3px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.14);
+  overflow: hidden;
+}
+
+.studio__progress-fill {
+  display: block;
+  width: 0;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #c84637, #d75a49 55%, #e9d8b4);
+  transition: width 250ms linear;
+}
+
 .studio__empty-title {
   margin-bottom: 0.4rem;
 }

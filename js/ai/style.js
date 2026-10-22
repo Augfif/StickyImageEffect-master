@@ -2,8 +2,15 @@ import { aiCopy } from "./copy.js";
 import { accessories, defaultAccessoryUrl } from "./accessories.js";
 import { patternBySlug, shotsForPattern } from "./patterns.js";
 import chairUrl from "../../images/ai/chair.png";
+import demoResultUrl from "../../images/岩墙花.jpg";
 
 const copy = aiCopy.studio;
+
+// TEMPORARY DEMO: the ai-drawing backend is not wired up for this showing, so
+// the page runs a fixed 20s job and ends on one hardcoded photo instead of
+// calling the API. Set DEMO to false to restore the real request.
+const DEMO = true;
+const DEMO_SECONDS = 20;
 
 // Dev and preview reach the ai-drawing backend through the proxy in
 // vite.config.js, so the browser only ever sees its own origin. A deployed build
@@ -68,6 +75,8 @@ const ui = {
   waitingTitle: byId("waiting-title"),
   waitingStage: byId("waiting-stage"),
   waitingTime: byId("waiting-time"),
+  waitingProgress: byId("waiting-progress"),
+  waitingBar: byId("waiting-bar"),
   waitingHint: byId("waiting-hint"),
   cancel: byId("cancel"),
   resultTitle: byId("result-title"),
@@ -206,6 +215,10 @@ ui.patternCopy.replaceChildren(
   })
 );
 renderAccessories();
+
+// The real service can take minutes and unknown time, so the bar only belongs
+// to the fixed-length demo.
+if (!DEMO) ui.waitingProgress.hidden = true;
 
 // --- states ----------------------------------------------------------------
 
@@ -362,10 +375,18 @@ function formatClock(seconds) {
   return `${String(Math.floor(total / 60)).padStart(2, "0")}:${String(total % 60).padStart(2, "0")}`;
 }
 
+function setProgress(ratio) {
+  const percent = Math.round(Math.min(1, Math.max(0, ratio)) * 100);
+  ui.waitingBar.style.width = `${percent}%`;
+  ui.waitingProgress.setAttribute("aria-valuenow", String(percent));
+}
+
 function tickClock() {
   const elapsed = (performance.now() - state.startedAt) / 1000;
   ui.waitingTime.textContent = formatClock(elapsed);
-  const stage = elapsed < 8 ? 0 : elapsed < 120 ? 1 : 2;
+  if (DEMO) setProgress(elapsed / DEMO_SECONDS);
+  const marks = DEMO ? [DEMO_SECONDS * 0.35, DEMO_SECONDS * 0.75] : [8, 120];
+  const stage = elapsed < marks[0] ? 0 : elapsed < marks[1] ? 1 : 2;
   ui.waitingStage.textContent = copy.waitingStages[stage];
 }
 
@@ -413,18 +434,57 @@ function showResult(blob, contentType) {
   show("result");
 }
 
+// The demo result is a bundled asset, so it is served from our own origin and
+// the download attribute still saves it under a friendly name.
+function showDemoResult() {
+  if (state.resultUrl) {
+    URL.revokeObjectURL(state.resultUrl);
+    state.resultUrl = null;
+  }
+  ui.resultImage.src = demoResultUrl;
+  ui.resultImage.alt = `${pattern.title} 造型结果`;
+  ui.download.href = demoResultUrl;
+  ui.download.setAttribute("download", `${pattern.title}-造型.jpg`);
+  show("result");
+}
+
+// Resolves when the fake job is done; rejects with AbortError so the shared
+// cancel path in generate() keeps working unchanged.
+function demoWait(signal) {
+  return new Promise((resolve, reject) => {
+    const onAbort = () => {
+      window.clearTimeout(timer);
+      const error = new Error("demo cancelled");
+      error.name = "AbortError";
+      reject(error);
+    };
+    const timer = window.setTimeout(() => {
+      signal.removeEventListener("abort", onAbort);
+      resolve();
+    }, DEMO_SECONDS * 1000);
+    signal.addEventListener("abort", onAbort, { once: true });
+  });
+}
+
 async function generate() {
   if (!state.files.selfie || state.busy) return;
 
   state.busy = true;
   setError("");
   show("waiting");
+  setProgress(0);
   startClock();
 
   const controller = new AbortController();
   state.controller = controller;
 
   try {
+    if (DEMO) {
+      await demoWait(controller.signal);
+      showDemoResult();
+      return;
+    }
+
     const presets = await loadPresets();
     const body = new FormData();
     body.append("person", state.files.selfie, state.files.selfie.name);
