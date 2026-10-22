@@ -12,7 +12,7 @@ import { resolve } from "node:path";
 // origin, or let the backend answer CORS.
 const apiProxy = {
   "/api": {
-    target: "http://127.0.0.1:8000",
+    target: "http://10.212.232.217:8000",
     changeOrigin: true
   }
 };

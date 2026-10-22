@@ -43,7 +43,7 @@ export const aiCopy = {
       VALIDATION: "上传内容不完整，请重新选择照片后再试。",
       CONFIGURATION_ERROR: "生成服务没有配置好（缺少 API Key），请联系后端。",
       GENERATION_FAILED: "生成失败，可以稍后再试一次。",
-      NETWORK: "连接不到生成服务，请确认 ai-drawing 已经在 8000 端口启动。",
+      NETWORK: "连接不到生成服务，请确认 10.212.232.217:8000 可访问。",
       CANCELLED: "已取消本次生成。"
     }
   }

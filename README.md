@@ -13,7 +13,7 @@ npm run dev        # / 开场页、/main.html 主界面、/ai.html 纹样目录�
 
 AI 布样册的十幅纹样、布面大图和对应人物见 `js/ai/patterns.js`：一级布面默认显示人物上身卡，点卡展开二级上身。
 织物扫描原图放在 `images/ai/source/`，缩略条与生成页读取 `images/ai/shots/<slug>.jpg`；造型生成页需要 `ai-drawing` 后端
-在 8000 端口运行，`npm run dev` 与 `npm run preview` 会通过 `/api` 代理过去。
+在 `10.212.232.217:8000` 运行，`npm run dev` 与 `npm run preview` 会通过 `/api` 代理过去。
 生成页的搭配物件放在 `images/ai/accessories/`，按 `01-名称.png` 自动排序和生成名称。
 十条目 `{ image, title, meta }`，`image: null` 的那几条就是还没补图的深色空框。只想调主界面的话
 直接开 `/main.html`。

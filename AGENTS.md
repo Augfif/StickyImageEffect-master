@@ -69,7 +69,7 @@ three.js 贴图。没有图的纹样标 `pending: true`，渲染成不可交互�
 作为兜底素材，保证旧后端契约可用。字段顺序必须与提示词里的「参考图1/2/3/4」一一对应，
 传反了语义就反了。
 
-开发与 `npm run preview` 都靠 `vite.config.js` 里的 `/api` → `127.0.0.1:8000` 代理，
+开发与 `npm run preview` 都靠 `vite.config.js` 里的 `/api` → `10.212.232.217:8000` 代理，
 所以本地不需要后端开 CORS。**静态部署后没有代理**：要么把前后端放在同一来源，
 要么给后端加 `Access-Control-Allow-Origin`，并把 `VITE_AI_API_BASE` 指到后端地址。
 
